@@ -1,26 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* 폰트 */
+  --font-sans: var(--font-pretendard), ui-sans-serif, system-ui, sans-serif;
+
+  /* 색상 변수 */
+  --color-primary-50: #fff9f2;
+  --color-primary-100: #fff4e6;
+  --color-primary-200: #ffe8cc;
+  --color-primary-300: #ffd8a8;
+  --color-primary-400: #ffa94d;
+  --color-primary-500: #fd7e14;
+  --color-primary-600: #e8590c;
+  --color-primary-700: #c04a12;
+  --color-primary-800: #9c3a10;
+  --color-primary-900: #7a2e0e;
+
+  --color-success-100: #e6fcf5;
+  --color-success-300: #8ce99a;
+  --color-success-500: #2fb344;
+  --color-success-700: #2b8a3e;
+
+  --color-warning-100: #fff4e6;
+  --color-warning-300: #ffe066;
+  --color-warning-500: #f5b301;
+  --color-warning-700: #e67700;
+
+  --color-error-100: #fff5f5;
+  --color-error-300: #ffa8a8;
+  --color-error-500: #e03131;
+  --color-error-700: #c92a2a;
+
+  --color-gray-50: #f8f9fa;
+  --color-gray-100: #f1f3f5;
+  --color-gray-200: #e9ecef;
+  --color-gray-300: #dee2e6;
+  --color-gray-400: #c5ccd4;
+  --color-gray-500: #adb5bd;
+  --color-gray-600: #868e96;
+  --color-gray-700: #495057;
+  --color-gray-800: #343a40;
+  --color-gray-900: #212529;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* typography */
+@utility text-heading-xl {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+@utility text-heading-l {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@utility text-title-l {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility text-title-m {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@utility text-body-l {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+@utility text-body-m {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@utility text-label-l {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+@utility text-label-m {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+@utility text-label-s {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+@layer base {
+  body {
+    background: var(--color-gray-50);
+    color: var(--color-gray-700);
+    font-family: var(--font-sans);
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
