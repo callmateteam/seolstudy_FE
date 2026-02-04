@@ -103,9 +103,16 @@
 }
 
 @layer base {
+  * {
+    box-sizing: border-box;
+  }
   body {
     background: var(--color-gray-50);
     color: var(--color-gray-700);
     font-family: var(--font-sans);
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 }
