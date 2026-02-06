@@ -56,13 +56,9 @@ export default function RoleSelect({ onNext }: RoleSelectProps) {
 
   return (
     <article className="mt-43.5">
-      <div className="text-center">
-        <h1 className="font-semibold text-[40px] text-primary-500 mb-2">
-          설스터디
-        </h1>
-        <span className="text-title-l text-gray-700">
-          어떤 역할로 이용하시나요?
-        </span>
+      <div className="mb-15 text-center">
+        <h1 className="text-primary-500 mb-2 text-[40px] font-semibold">설스터디</h1>
+        <span className="text-title-l text-gray-700">어떤 역할로 이용하시나요?</span>
       </div>
       <div className="flex items-center gap-3">
         {roleOptions.map((option) => {
@@ -76,15 +72,13 @@ export default function RoleSelect({ onNext }: RoleSelectProps) {
               onMouseEnter={() => setHoveredRole(option.role)}
               onMouseLeave={() => setHoveredRole(null)}
               aria-pressed={isActive}
-              className="flex flex-col items-center gap-2 cursor-pointer"
+              className="flex cursor-pointer flex-col items-center gap-2"
             >
               <Image
                 alt={isActive ? option.activeAlt : option.defaultAlt}
                 src={isActive ? option.activeImage : option.defaultImage}
               />
-              <span
-                className={`text-label-l ${isActive ? "text-primary-500" : "text-gray-700"}`}
-              >
+              <span className={`text-label-l ${isActive ? "text-primary-500" : "text-gray-700"}`}>
                 {option.label}
               </span>
             </button>

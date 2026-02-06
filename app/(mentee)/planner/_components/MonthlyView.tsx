@@ -24,9 +24,13 @@ function toDateKey(date: Date): string {
 export default function MonthlyView({
   weeks,
   completionStatus,
+  onDateClick,
+  selectedDate,
 }: {
   weeks: DayInfo[][];
   completionStatus: Record<string, CompletionStatus>;
+  onDateClick?: (date: string) => void;
+  selectedDate?: string;
 }) {
   return (
     <div>
@@ -47,17 +51,22 @@ export default function MonthlyView({
             const status: CompletionStatus =
               completionStatus[key] ?? "none";
 
+            const isSelected = selectedDate === key;
+
             return (
               <div key={di} className="flex flex-col items-center">
-                {/* 날짜 원 — 오늘이면 오렌지 배경 + 내부 흰색 닷 */}
+                {/* 날짜 원 — 선택된 날짜면 오렌지 배경 */}
                 <div
-                  className={`flex h-10 w-10 flex-col items-center justify-center rounded-full ${
-                    day.isToday ? "bg-primary-500" : ""
+                  onClick={() => onDateClick?.(key)}
+                  className={`flex h-10 w-10 flex-col items-center justify-center rounded-full cursor-pointer transition-colors ${
+                    isSelected
+                      ? "bg-primary-500 hover:bg-primary-600"
+                      : "hover:bg-gray-100"
                   }`}
                 >
                   <span
                     className={`text-body-m ${
-                      day.isToday
+                      isSelected
                         ? "text-white"
                         : day.isCurrentMonth
                           ? "text-gray-900"
@@ -66,16 +75,16 @@ export default function MonthlyView({
                   >
                     {day.date.getDate()}
                   </span>
-                  {day.isToday && status !== "none" && (
+                  {isSelected && status !== "none" && (
                     <div
                       className={`rounded-full bg-white ${DOT_SIZE[status]}`}
                     />
                   )}
                 </div>
 
-                {/* 완료율 닷 — 오늘이 아닌 날짜만 표시 */}
+                {/* 완료율 닷 — 선택되지 않은 날짜만 표시 */}
                 <div className="flex h-2.5 items-center justify-center">
-                  {!day.isToday && status !== "none" && (
+                  {!isSelected && status !== "none" && (
                     <div
                       className={`rounded-full bg-primary-500 ${DOT_SIZE[status]}`}
                     />
