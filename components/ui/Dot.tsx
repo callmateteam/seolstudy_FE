@@ -1,6 +1,6 @@
 interface DotProps {
   size?: "sm" | "md" | "lg";
-  color?: "primary" | "white" | "gray";
+  color?: "primary" | "white" | "gray" | "success" | "warning" | "error";
 }
 
 const SIZE: Record<string, string> = {
@@ -13,6 +13,9 @@ const COLOR: Record<string, string> = {
   primary: "bg-primary-500",
   white: "bg-white",
   gray: "bg-gray-300",
+  success: "bg-success-500",
+  warning: "bg-warning-500",
+  error: "bg-error-500",
 };
 
 export default function Dot({ size = "md", color = "primary" }: DotProps) {
