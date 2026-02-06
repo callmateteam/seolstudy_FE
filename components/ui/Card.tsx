@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 type CardVariant = "default" | "primary";
 
 interface CardProps {
   title: string;
-  description: string;
+  description: ReactNode;
   variant?: CardVariant;
 }
 
@@ -17,7 +19,7 @@ export default function Card({ title, description, variant = "default" }: CardPr
   return (
     <div className={`rounded-xl p-4 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)] ${bg}`}>
       <p className={`mb-1 text-title-l ${titleColor}`}>{title}</p>
-      <p className={`text-body-m ${desc}`}>{description}</p>
+      <div className={`text-body-m ${desc} space-y-1`}>{description}</div>
     </div>
   );
 }

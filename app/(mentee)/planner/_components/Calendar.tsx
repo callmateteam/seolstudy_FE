@@ -4,6 +4,10 @@ import { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
 import WeeklyView from "./WeeklyView";
 import MonthlyView from "./MonthlyView";
+import { useIsDesktop } from "@/_hooks/useMediaQuery";
+import { useSelectedDate } from "../_hooks/useSelectedDate";
+import { useCalendarCompletion } from "../_hooks/useCalendarCompletion";
+import { transformMonthlyToRecord } from "../_utils/transformers";
 
 type ViewMode = "weekly" | "monthly";
 
@@ -15,13 +19,6 @@ export type DayInfo = {
   isCurrentMonth: boolean;
 };
 
-function getCompletionStatus(pct: number): CompletionStatus {
-  if (pct === 0) return "none";
-  if (pct <= 33) return "low";
-  if (pct <= 66) return "mid";
-  return "high";
-}
-
 /** 해당 날짜가 속한 주의 월요일 (00:00:00) */
 function getMondayOf(date: Date): Date {
   const d = new Date(date);
@@ -31,31 +28,30 @@ function getMondayOf(date: Date): Date {
   return d;
 }
 
-// ── Mock 완료율 데이터 (API 연결 시 교체) ──
-const MOCK_COMPLETION: Record<string, number> = {
-  "2026-01-26": 70,
-  "2026-01-27": 25,
-  "2026-01-28": 50,
-  "2026-01-29": 45,
-  "2026-01-30": 55,
-  "2026-01-31": 60,
-  "2026-02-01": 80,
-  "2026-02-02": 40,
-};
-
 export default function Calendar() {
+  const { selectedDate, setSelectedDate } = useSelectedDate();
+  const isDesktop = useIsDesktop();
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
   }, []);
 
-  const [viewMode, setViewMode] = useState<ViewMode>("weekly");
+  const [viewMode, setViewMode] = useState<ViewMode>("monthly");
   const [currentDate, setCurrentDate] = useState<Date>(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
   });
+
+  // API에서 월간 완료율 데이터 가져오기
+  const { data: completionData, loading } = useCalendarCompletion(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+  );
+
+  // 데스크탑: 항상 monthly, 모바일: 토글 가능
+  const effectiveViewMode = isDesktop ? "monthly" : viewMode;
 
   // ── 주간 데이터 ──
   const weekDays: DayInfo[] = useMemo(() => {
@@ -104,47 +100,52 @@ export default function Calendar() {
 
   // ── 완료율 스테이터스 맵 ──
   const completionStatus = useMemo(() => {
-    const result: Record<string, CompletionStatus> = {};
-    for (const [key, pct] of Object.entries(MOCK_COMPLETION)) {
-      result[key] = getCompletionStatus(pct);
-    }
-    return result;
-  }, []);
+    if (!completionData) return {};
+    return transformMonthlyToRecord(completionData.days);
+  }, [completionData]);
+
+  // ── 날짜 클릭 핸들러 ──
+  const handleDateClick = (dateKey: string) => {
+    setSelectedDate(dateKey);
+  };
 
   // ── 탐색 핸들러 ──
   const handlePrev = () => {
     const d = new Date(currentDate);
-    if (viewMode === "weekly") d.setDate(d.getDate() - 7);
+    if (effectiveViewMode === "weekly") d.setDate(d.getDate() - 7);
     else d.setMonth(d.getMonth() - 1);
     setCurrentDate(d);
   };
 
   const handleNext = () => {
     const d = new Date(currentDate);
-    if (viewMode === "weekly") d.setDate(d.getDate() + 7);
+    if (effectiveViewMode === "weekly") d.setDate(d.getDate() + 7);
     else d.setMonth(d.getMonth() + 1);
     setCurrentDate(d);
   };
 
   // 헤더 표시 연도·월
   const headerYear =
-    viewMode === "weekly"
-      ? weekDays[0].date.getFullYear()
-      : currentDate.getFullYear();
+    effectiveViewMode === "weekly" ? weekDays[0].date.getFullYear() : currentDate.getFullYear();
   const headerMonth =
-    viewMode === "weekly"
-      ? weekDays[0].date.getMonth()
-      : currentDate.getMonth();
+    effectiveViewMode === "weekly" ? weekDays[0].date.getMonth() : currentDate.getMonth();
 
   return (
     <div className="my-3 rounded-2xl bg-white p-4 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
       {/* 헤더: Today | < YYYY.MM > | 뷰 토글 */}
       <div className="flex items-center justify-between">
-        {viewMode === "monthly" ? (
+        {effectiveViewMode === "monthly" ? (
           <button
             type="button"
-            onClick={() => setCurrentDate(today)}
-            className="cursor-pointer text-label-l text-primary-500"
+            onClick={() => {
+              const year = today.getFullYear();
+              const month = String(today.getMonth() + 1).padStart(2, "0");
+              const day = String(today.getDate()).padStart(2, "0");
+              const todayString = `${year}-${month}-${day}`;
+              setSelectedDate(todayString);
+              setCurrentDate(today);
+            }}
+            className="text-label-l text-primary-500 cursor-pointer"
           >
             Today
           </button>
@@ -153,45 +154,41 @@ export default function Calendar() {
         )}
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handlePrev}
-            className="cursor-pointer text-gray-600"
-          >
+          <button type="button" onClick={handlePrev} className="cursor-pointer text-gray-600">
             <ChevronLeft size={20} />
           </button>
           <span className="text-title-m text-gray-900">
             {headerYear}. {String(headerMonth + 1).padStart(2, "0")}
           </span>
-          <button
-            type="button"
-            onClick={handleNext}
-            className="cursor-pointer text-gray-600"
-          >
+          <button type="button" onClick={handleNext} className="cursor-pointer text-gray-600">
             <ChevronRight size={20} />
           </button>
         </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setViewMode((v) => (v === "weekly" ? "monthly" : "weekly"))
-          }
-          className="flex cursor-pointer items-center gap-1 rounded-lg bg-gray-100 px-2.5 py-1 text-label-m text-gray-700"
-        >
-          <SlidersHorizontal size={13} />
-          {viewMode === "weekly" ? "월간" : "주간"}
-        </button>
+        {!isDesktop ? (
+          <button
+            type="button"
+            onClick={() => setViewMode((v) => (v === "weekly" ? "monthly" : "weekly"))}
+            className="text-label-m flex cursor-pointer items-center gap-1 rounded-lg bg-gray-100 px-2.5 py-1 text-gray-700"
+          >
+            <SlidersHorizontal size={13} />
+            {viewMode === "weekly" ? "월간" : "주간"}
+          </button>
+        ) : (
+          <div className="w-16" />
+        )}
       </div>
 
       {/* 캘린더 본문 */}
       <div className="mt-4">
-        {viewMode === "weekly" ? (
+        {effectiveViewMode === "weekly" ? (
           <WeeklyView days={weekDays} />
         ) : (
           <MonthlyView
             weeks={monthWeeks}
             completionStatus={completionStatus}
+            onDateClick={handleDateClick}
+            selectedDate={selectedDate}
           />
         )}
       </div>

@@ -1,4 +1,4 @@
-import Button from "@/app/_components/ui/Button";
+import Button from "@/components/ui/Button";
 import type { UserRole } from "./RoleSelect";
 
 interface LoginProps {
