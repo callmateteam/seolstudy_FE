@@ -26,17 +26,26 @@ export default function PlannerQnaCards({ comments, feedback }: PlannerQnaCardsP
     <>
       {/* 내가 남긴 코멘트 섹션 */}
       {comments.length > 0 && (
-        <section className="flex flex-col gap-2 rounded-xl bg-white p-3 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+        <section className="flex flex-col gap-2 rounded-xl bg-white p-3 shadow-card">
           <p className="text-title-l text-gray-900">내가 남긴 코멘트</p>
-          <div className="flex flex-col gap-1">
+          <div className="flex max-h-40 flex-col gap-2 overflow-y-auto">
             {comments.map((comment) => (
               <button
                 key={comment.id}
                 type="button"
                 onClick={() => handleCommentClick(comment)}
-                className="cursor-pointer text-left"
+                className="flex cursor-pointer items-center justify-between gap-2 rounded-lg p-2 text-left transition-colors hover:bg-gray-50"
               >
-                <p className="text-body-m text-gray-700">Q. {comment.content}</p>
+                <p className="text-body-m flex-1 text-gray-700">Q. {comment.content}</p>
+                {comment.mentorReply ? (
+                  <span className="text-label-s shrink-0 rounded-full bg-success-100 px-2 py-0.5 text-success-700">
+                    답변완료
+                  </span>
+                ) : (
+                  <span className="text-label-s shrink-0 rounded-full bg-warning-100 px-2 py-0.5 text-warning-700">
+                    답변 대기중
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -72,13 +81,23 @@ export default function PlannerQnaCards({ comments, feedback }: PlannerQnaCardsP
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <span className="text-title-m text-gray-900">A.</span>
-                  <p className="text-body-m text-gray-700">
-                    {selectedComment.mentorReply || "멘토님이 곧 답변할 예정입니다."}
-                  </p>
+                  {selectedComment.mentorReply ? (
+                    <p className="text-body-m text-gray-700">
+                      {selectedComment.mentorReply}
+                    </p>
+                  ) : (
+                    <div className="flex flex-1 items-center gap-2 rounded-lg bg-warning-100 p-3">
+                      <p className="text-body-m text-warning-700">
+                        답변 대기중 — 멘토님이 곧 답변할 예정입니다.
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <p className="text-label-s text-right text-gray-400">
-                  {selectedComment.repliedAt ? formatDateTime(selectedComment.repliedAt) : "-"}
-                </p>
+                {selectedComment.repliedAt && (
+                  <p className="text-label-s text-right text-gray-400">
+                    {formatDateTime(selectedComment.repliedAt)}
+                  </p>
+                )}
               </div>
             </div>
 

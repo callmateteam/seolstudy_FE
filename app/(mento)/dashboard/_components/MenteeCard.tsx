@@ -9,6 +9,12 @@ interface MenteeCardProps {
   recentDensity: number;
 }
 
+const SUBJECT_DISPLAY: Record<string, string> = {
+  KOREAN: "국어",
+  ENGLISH: "영어",
+  MATH: "수학",
+};
+
 function getDensityColor(value: number) {
   if (value >= 80) return "bg-success-500";
   if (value >= 60) return "bg-warning-500";
@@ -25,14 +31,14 @@ export default function MenteeCard({
   const clampedDensity = Math.min(100, Math.max(0, recentDensity));
 
   return (
-    <div className="flex w-68.25 flex-col gap-5 rounded-xl border border-gray-200 bg-white p-6">
+    <div className="flex w-full flex-col gap-5 rounded-xl border border-gray-200 bg-white p-6 lg:w-68.25">
       <div className="flex items-center gap-4">
         <Avatar initials={name.charAt(0)} variant="default" size="lg" />
         <div className="flex flex-col">
           <span className="text-title-l text-gray-900">
             {name} ({grade})
           </span>
-          <span className="text-body-m text-gray-500">{subjects.join(" · ")}</span>
+          <span className="text-body-m text-gray-500">{subjects.map((s) => SUBJECT_DISPLAY[s] ?? s).join(" · ")}</span>
         </div>
       </div>
       <div className="flex flex-col gap-2">

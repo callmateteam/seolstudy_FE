@@ -17,7 +17,7 @@ export default function Card({ title, description, variant = "default" }: CardPr
   const { bg, title: titleColor, desc } = VARIANT[variant];
 
   return (
-    <div className={`rounded-xl p-4 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)] ${bg}`}>
+    <div className={`rounded-xl p-4 shadow-card ${bg}`}>
       <p className={`mb-1 text-title-l ${titleColor}`}>{title}</p>
       <div className={`text-body-m ${desc} space-y-1`}>{description}</div>
     </div>

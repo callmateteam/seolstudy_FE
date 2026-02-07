@@ -184,7 +184,8 @@ export default function AddTaskModal({ isOpen, onClose, onSave }: AddTaskModalPr
           <button
             type="button"
             onClick={handleSave}
-            className="text-label-m bg-primary-500 flex-1 cursor-pointer rounded-xl py-3 text-white"
+            disabled={!name.trim()}
+            className="text-label-m bg-primary-500 flex-1 cursor-pointer rounded-xl py-3 text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             저장
           </button>

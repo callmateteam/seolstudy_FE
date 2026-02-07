@@ -1,6 +1,3 @@
-// API Response Types from mock.ts
-export type { SuccessResponse, ErrorResponse } from "@/app/mock";
-
 // Task Types
 export type TaskStatus = "PENDING" | "COMPLETED" | "SUBMITTED" | "FAILED";
 export type TaskSubject = "KOREAN" | "MATH" | "ENGLISH";

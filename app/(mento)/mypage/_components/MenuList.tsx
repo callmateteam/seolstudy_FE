@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 
 interface MenuItemRow {
   label: string;
@@ -11,10 +11,10 @@ interface MenuItemRow {
 }
 
 export default function MenuList() {
-  const router = useRouter();
+  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    router.push("/login");
+  const handleLogout = async () => {
+    await logout();
   };
 
   const items: MenuItemRow[] = [
@@ -25,16 +25,16 @@ export default function MenuList() {
   ];
 
   return (
-    <div className="rounded-2xl bg-white shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
       {items.map((item, idx) => (
         <button
           key={item.label}
           type="button"
           onClick={item.onClick}
-          className={`flex w-full cursor-pointer items-center justify-between px-6 py-4 text-left ${
+          className={`flex w-full cursor-pointer items-center justify-between px-4 py-3.5 text-left ${
             idx < items.length - 1 ? "border-b border-gray-100" : ""
           } ${
-            item.variant === "primary" ? "text-body-m text-error-500" : "text-body-m text-gray-900"
+            item.variant === "primary" ? "text-body-m text-primary-500" : "text-body-m text-gray-900"
           }`}
         >
           {item.label}

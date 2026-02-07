@@ -21,7 +21,7 @@ import CircularProgress from "@/components/ui/CircularProgress";
 
 function Section({ title, desc, children }: { title: string; desc: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+    <section className="rounded-2xl bg-white p-6 shadow-card">
       <h2 className="text-heading-l mb-2 text-gray-900">{title}</h2>
       <p className="text-body-m mb-4 text-gray-500">{desc}</p>
       {children}

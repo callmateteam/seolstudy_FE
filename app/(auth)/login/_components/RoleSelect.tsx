@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import mentiDefault from "@/assets/profileImgs/Role=Mentee, State=Default.png";
 import mentiHover from "@/assets/profileImgs/Role=Menti, State=Hovered.png";
 import mentorDefault from "@/assets/profileImgs/Role=Mentor, State=Default.png";
@@ -57,7 +58,7 @@ export default function RoleSelect({ onNext }: RoleSelectProps) {
   return (
     <article className="mt-43.5">
       <div className="mb-15 text-center">
-        <h1 className="text-primary-500 mb-2 text-[40px] font-semibold">설스터디</h1>
+        <Link href="/" className="text-primary-500 mb-2 block text-[40px] font-semibold">설스터디</Link>
         <span className="text-title-l text-gray-700">어떤 역할로 이용하시나요?</span>
       </div>
       <div className="flex items-center gap-3">

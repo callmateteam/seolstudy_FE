@@ -105,6 +105,11 @@
   letter-spacing: 0.01em;
 }
 
+/* shadow */
+@utility shadow-card {
+  box-shadow: 1px 1px 4px 2px rgba(0, 0, 0, 0.08);
+}
+
 @layer base {
   * {
     box-sizing: border-box;

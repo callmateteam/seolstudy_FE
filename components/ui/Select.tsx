@@ -43,7 +43,7 @@ export default function Select({ options, value, placeholder = "선택해주세�
       </button>
 
       {isOpen && !disabled && (
-        <div className="absolute inset-x-0 z-10 mt-1 rounded-lg border border-gray-200 bg-white shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+        <div className="absolute inset-x-0 z-10 mt-1 rounded-lg border border-gray-200 bg-white shadow-card">
           {options.map((option) => (
             <button
               key={option.value}
