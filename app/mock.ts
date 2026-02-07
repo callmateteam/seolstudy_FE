@@ -68,10 +68,10 @@ const users = [
     id: "user-mentor-1",
     loginId: "mentor01",
     role: "MENTOR",
-    name: "김수",
+    name: "김서연",
     phone: "01033334444",
     profileImage: null,
-    nickname: "수",
+    nickname: "서연",
   },
   {
     id: "user-parent-1",
@@ -100,10 +100,13 @@ const mentorProfile = {
   id: "mentor-1",
   userId: "user-mentor-1",
   university: "서울대학교",
-  department: "수학과",
-  subjects: ["MATH"],
+  college: "사범대학",
+  department: "교육학과",
+  enrollmentStatus: "재학중",
+  subjects: ["KOREAN", "ENGLISH", "MATH"],
   coachingExperience: true,
   onboardingDone: true,
+  joinedAt: "2025-12-24T00:00:00Z",
 };
 
 const parentProfile = {
@@ -1279,7 +1282,27 @@ export async function mockRequest(req: MockRequest): Promise<SuccessResponse<any
     return ok(sheet);
   }
 
-  // My Page
+  // Mentor My Page
+  if (method === "GET" && path === "/api/my/mentor") {
+    return ok({
+      id: mentorProfile.id,
+      role: "MENTOR",
+      name: users[1].name,
+      profileImage: users[1].profileImage,
+      joinedAt: mentorProfile.joinedAt,
+      university: mentorProfile.university,
+      college: mentorProfile.college,
+      department: mentorProfile.department,
+      enrollmentStatus: mentorProfile.enrollmentStatus,
+      subjects: mentorProfile.subjects,
+      activitySummary: {
+        totalFeedbacks: 98,
+        consecutiveDays: 23,
+      },
+    });
+  }
+
+  // Mentee My Page
   if (method === "GET" && path === "/api/my") {
     return ok({
       id: menteeProfile.id,
