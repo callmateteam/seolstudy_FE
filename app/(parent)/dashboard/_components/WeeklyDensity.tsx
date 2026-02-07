@@ -14,7 +14,7 @@ export default function WeeklyDensity({
       <h3 className="text-title-l text-gray-900">이번주 학습 밀도 (집중도)</h3>
 
       <div className="mt-4 flex flex-col items-center">
-        <CircularProgress value={score} label="학습 밀도" />
+        <CircularProgress value={score} suffix="점" />
         <p className="text-body-m mt-4 text-center text-gray-700">
           {description}
         </p>
