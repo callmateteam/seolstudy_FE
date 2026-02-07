@@ -1,10 +1,10 @@
 const RADIUS = 48;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const ARC_RATIO = 0.75;
 
 interface CircularProgressProps {
   value: number;
-  label: string;
+  label?: string;
+  suffix?: string;
 }
 
 function getStrokeColor(value: number): string {
@@ -13,12 +13,12 @@ function getStrokeColor(value: number): string {
   return "var(--color-error-500)";
 }
 
-export default function CircularProgress({ value, label }: CircularProgressProps) {
+export default function CircularProgress({ value, label, suffix }: CircularProgressProps) {
   const clamped = Math.min(100, Math.max(0, value));
-  const bgArc = ARC_RATIO * CIRCUMFERENCE;
-  const bgGap = CIRCUMFERENCE - bgArc;
-  const progressArc = (clamped / 100) * bgArc;
+  const progressArc = (clamped / 100) * CIRCUMFERENCE;
   const progressGap = CIRCUMFERENCE - progressArc;
+
+  const hasLabel = label != null && label.length > 0;
 
   return (
     <div className="flex h-32 w-32 items-center justify-center">
@@ -31,8 +31,6 @@ export default function CircularProgress({ value, label }: CircularProgressProps
           stroke="var(--color-gray-200)"
           strokeWidth={10}
           strokeLinecap="round"
-          strokeDasharray={`${bgArc} ${bgGap}`}
-          transform="rotate(135 60 60)"
         />
         <circle
           cx="60"
@@ -43,14 +41,30 @@ export default function CircularProgress({ value, label }: CircularProgressProps
           strokeWidth={10}
           strokeLinecap="round"
           strokeDasharray={`${progressArc} ${progressGap}`}
-          transform="rotate(135 60 60)"
+          transform="rotate(-90 60 60)"
         />
-        <text x="60" y="52" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: "22px", fontWeight: 700 }} fill="var(--color-gray-900)">
-          {clamped}
+        <text
+          x="60"
+          y={hasLabel ? 52 : 60}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          style={{ fontSize: "22px", fontWeight: 700 }}
+          fill="var(--color-gray-900)"
+        >
+          {clamped}{suffix}
         </text>
-        <text x="60" y="72" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: "11px", fontWeight: 400 }} fill="var(--color-gray-500)">
-          {label}
-        </text>
+        {hasLabel && (
+          <text
+            x="60"
+            y="72"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            style={{ fontSize: "11px", fontWeight: 400 }}
+            fill="var(--color-gray-500)"
+          >
+            {label}
+          </text>
+        )}
       </svg>
     </div>
   );
