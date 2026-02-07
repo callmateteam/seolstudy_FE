@@ -5,6 +5,8 @@ interface AvatarProps {
   initials: string;
   variant?: AvatarVariant;
   size?: AvatarSize;
+  src?: string;
+  alt?: string;
 }
 
 const SIZE: Record<AvatarSize, string> = {
@@ -18,10 +20,14 @@ const VARIANT: Record<AvatarVariant, string> = {
   primary: "bg-primary-100 text-primary-500",
 };
 
-export default function Avatar({ initials, variant = "default", size = "md" }: AvatarProps) {
+export default function Avatar({ initials, variant = "default", size = "md", src, alt }: AvatarProps) {
   return (
-    <div className={`flex items-center justify-center rounded-full font-semibold ${SIZE[size]} ${VARIANT[variant]}`}>
-      {initials.slice(0, 2)}
+    <div className={`flex items-center justify-center rounded-full font-semibold overflow-hidden ${SIZE[size]} ${VARIANT[variant]}`}>
+      {src ? (
+        <img src={src} alt={alt ?? initials} className="h-full w-full object-cover" />
+      ) : (
+        initials.slice(0, 2)
+      )}
     </div>
   );
 }
