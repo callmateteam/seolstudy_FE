@@ -1,24 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Avatar from "@/components/ui/Avatar";
+import { menteeApi } from "@/lib/api/mentee";
 
 export default function MenteeProfileEditPage() {
   const router = useRouter();
-  const [name, setName] = useState("이하은");
-  const [school, setSchool] = useState("서울고등학교");
-  const [grade, setGrade] = useState("고2");
-  const [phone, setPhone] = useState("010-1234-5678");
+  const [name, setName] = useState("");
+  const [school, setSchool] = useState("");
+  const [grade, setGrade] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    // TODO: API 연결
-    console.log("프로필 저장:", { name, school, grade, phone });
-    router.back();
+  useEffect(() => {
+    menteeApi
+      .getMyPage()
+      .then((data) => {
+        setName(data.name ?? "");
+        setSchool(data.school ?? "");
+        setGrade(data.grade ?? "");
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await menteeApi.updateMyPage({ name, school });
+      router.back();
+    } catch {
+      alert("프로필 저장에 실패했습니다.");
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <article className="mt-7 px-5">
+        <div className="flex items-center justify-center py-20">
+          <p className="text-body-m text-gray-500">로딩중...</p>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="mt-7 px-5">
@@ -34,7 +65,7 @@ export default function MenteeProfileEditPage() {
       </div>
 
       <div className="mt-8 flex flex-col items-center">
-        <Avatar initials="이" size="lg" variant="primary" />
+        <Avatar initials={name.charAt(0) || "?"} size="lg" variant="primary" />
         <button
           type="button"
           className="text-label-m text-primary-500 mt-2 cursor-pointer"
@@ -61,16 +92,18 @@ export default function MenteeProfileEditPage() {
           type="text"
           value={grade}
           onChange={(e) => setGrade(e.target.value)}
+          disabled
         />
         <Input
           label="휴대폰 번호"
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          disabled
         />
 
-        <Button fullWidth onClick={handleSave}>
-          저장하기
+        <Button fullWidth onClick={handleSave} disabled={saving}>
+          {saving ? "저장 중..." : "저장하기"}
         </Button>
       </div>
     </article>

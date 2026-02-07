@@ -1,57 +1,110 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { mockGet } from "@/app/mock";
+import { menteeApi } from "@/lib/api/mentee";
+import type { MenteeMyPageResponse } from "@/lib/api/menteeTypes";
 import MenteeProfileCard from "./_components/MenteeProfileCard";
+import SubjectProgress from "./_components/SubjectProgress";
 import MenteeActivitySummary from "./_components/MenteeActivitySummary";
 import MenteeMenuList from "./_components/MenteeMenuList";
 
-interface MenteeMyPageData {
+interface SubjectData {
+  icon: string;
   name: string;
-  profileImage: string | null;
-  school: string;
-  grade: string;
-  totalTasks: number;
-  consecutiveDays: number;
+  subcategories: string;
+  progress: number;
+  completed: number;
+  total: number;
+  density: number;
+}
+
+const SUBJECT_META: Record<string, { icon: string; name: string; subcategories: string }> = {
+  KOREAN: { icon: "가", name: "국어", subcategories: "비문학 · 문학 · 문법" },
+  ENGLISH: { icon: "Aa", name: "영어", subcategories: "어휘 · 독해 · 문법" },
+  MATH: { icon: "f(x)", name: "수학", subcategories: "미적분 · 확통 · 기하" },
+};
+
+function formatJoinDate(isoDate: string): string {
+  const d = new Date(isoDate);
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+
+function mapSubjectStats(stats: MenteeMyPageResponse["subjectStats"]): SubjectData[] {
+  return stats.map((stat) => {
+    const meta = SUBJECT_META[stat.subject] ?? { icon: "?", name: stat.subject, subcategories: "" };
+    return {
+      icon: meta.icon,
+      name: meta.name,
+      subcategories: meta.subcategories,
+      progress: Math.round(stat.completionRate),
+      completed: stat.completedTasks,
+      total: stat.totalTasks,
+      density: stat.avgDensityScore != null ? Math.round(stat.avgDensityScore) : 0,
+    };
+  });
 }
 
 export default function MenteeMyPage() {
-  const [data, setData] = useState<MenteeMyPageData | null>(null);
+  const [data, setData] = useState<MenteeMyPageResponse | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData() {
-      const response = await mockGet("/api/my/mentee");
-      if (response.success) {
-        setData(response.data as MenteeMyPageData);
-      }
-    }
-    fetchData();
+    menteeApi
+      .getMyPage()
+      .then(setData)
+      .catch(() => setData(null))
+      .finally(() => setLoading(false));
   }, []);
 
-  // mock fallback
-  const pageData = data ?? {
-    name: "이하은",
-    profileImage: null,
-    school: "서울고등학교",
-    grade: "고2",
-    totalTasks: 42,
-    consecutiveDays: 7,
-  };
+  if (loading) {
+    return (
+      <article className="mt-7 px-5 lg:mx-auto lg:max-w-7xl">
+        <h1 className="text-heading-xl text-gray-900">마이</h1>
+        <div className="flex items-center justify-center py-20">
+          <p className="text-body-m text-gray-500">로딩중...</p>
+        </div>
+      </article>
+    );
+  }
+
+  if (!data) {
+    return (
+      <article className="mt-7 px-5 lg:mx-auto lg:max-w-7xl">
+        <h1 className="text-heading-xl text-gray-900">마이</h1>
+        <div className="flex items-center justify-center py-20">
+          <p className="text-body-m text-gray-500">데이터를 불러올 수 없습니다.</p>
+        </div>
+      </article>
+    );
+  }
+
+  const subjectNames = data.subjects.map(
+    (s) => SUBJECT_META[s]?.name ?? s,
+  );
+
+  const mentorName = data.mentor
+    ? `${data.mentor.name} (${data.mentor.university} ${data.mentor.department})`
+    : "-";
 
   return (
-    <article className="mt-7 px-5">
-      <h1 className="text-heading-xl text-gray-900">마이페이지</h1>
+    <article className="mt-7 px-5 lg:mx-auto lg:max-w-7xl">
+      <h1 className="text-heading-xl text-gray-900">마이</h1>
 
-      <div className="mt-6 flex flex-col gap-6">
+      <div className="mt-6 flex flex-col gap-6 pb-8">
         <MenteeProfileCard
-          name={pageData.name}
-          profileImage={pageData.profileImage}
-          school={pageData.school}
-          grade={pageData.grade}
+          name={data.name}
+          profileImage={data.profileImage}
+          joinDate={formatJoinDate(data.joinedAt)}
+          school={data.school ?? "-"}
+          grade={data.grade ?? "-"}
+          subjects={subjectNames}
+          mentorName={mentorName}
         />
+        <SubjectProgress subjects={mapSubjectStats(data.subjectStats)} />
         <MenteeActivitySummary
-          totalTasks={pageData.totalTasks}
-          consecutiveDays={pageData.consecutiveDays}
+          consecutiveDays={data.activitySummary?.consecutiveDays ?? 0}
+          totalTasks={data.activitySummary?.totalCompletedTasks ?? 0}
+          densityExcellence={data.activitySummary?.totalFeedbacks ?? 0}
         />
         <MenteeMenuList />
       </div>

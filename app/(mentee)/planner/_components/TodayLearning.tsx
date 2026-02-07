@@ -7,6 +7,8 @@ import { useIsDesktop } from "@/_hooks/useMediaQuery";
 import AddTaskModal, { TaskFormData } from "./AddTaskModal";
 import { Task as APITask, TaskDisplayStatus } from "../_types";
 import { mapTaskStatus, formatDuration } from "../_utils/transformers";
+import { menteeApi } from "@/lib/api/mentee";
+import { useSelectedDate } from "../_hooks/useSelectedDate";
 
 type Task = {
   id: string;
@@ -25,6 +27,7 @@ const STATUS_COLOR_MAP: Record<TaskDisplayStatus, string> = {
 
 interface TodayLearningProps {
   tasks: APITask[];
+  onTaskCreated?: () => void;
 }
 
 // API Task 타입을 컴포넌트 내부 Task 타입으로 변환
@@ -44,8 +47,20 @@ const transformAPITaskToDisplayTask = (apiTask: APITask): Task => {
   };
 };
 
-export default function TodayLearning({ tasks: apiTasks }: TodayLearningProps) {
+const SUBJECT_TO_API: Record<string, "KOREAN" | "ENGLISH" | "MATH"> = {
+  "국어": "KOREAN",
+  "영어": "ENGLISH",
+  "수학": "MATH",
+};
+
+const DAY_TO_API: Record<string, string> = {
+  "월": "MON", "화": "TUE", "수": "WED", "목": "THU",
+  "금": "FRI", "토": "SAT", "일": "SUN",
+};
+
+export default function TodayLearning({ tasks: apiTasks, onTaskCreated }: TodayLearningProps) {
   const router = useRouter();
+  const { selectedDate } = useSelectedDate();
   const displayTasks = apiTasks.map(transformAPITaskToDisplayTask);
   const isDesktop = useIsDesktop();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -57,9 +72,38 @@ export default function TodayLearning({ tasks: apiTasks }: TodayLearningProps) {
     router.push(`/solve/${apiTask.subject.toLowerCase()}/${apiTask.id}`);
   };
 
-  const handleSaveTask = (task: TaskFormData) => {
-    console.log("저장된 과제:", task);
-    // TODO: API 연결 시 실제 저장 로직 추가
+  const handleSaveTask = async (task: TaskFormData) => {
+    if (!task.name.trim()) {
+      alert("과제명을 입력해주세요.");
+      return;
+    }
+
+    const subject = SUBJECT_TO_API[task.subject];
+    if (!subject) return;
+
+    const targetStudyMinutes = task.useTargetTime
+      ? (parseInt(task.targetHours) || 0) * 60 + (parseInt(task.targetMinutes) || 0)
+      : undefined;
+
+    const repeatDays = task.repeat
+      ? task.repeatDays.map((d) => DAY_TO_API[d]).filter(Boolean)
+      : undefined;
+
+    try {
+      await menteeApi.createTask({
+        date: selectedDate,
+        title: task.name.trim(),
+        subject,
+        repeat: task.repeat,
+        repeatDays,
+        targetStudyMinutes,
+        memo: task.memo || undefined,
+      });
+      onTaskCreated?.();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "과제 추가에 실패했습니다.";
+      alert(message);
+    }
   };
 
   const handleScroll = useCallback(() => {

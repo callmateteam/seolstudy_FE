@@ -1,9 +1,13 @@
+"use client";
+
 import type { ReactNode } from "react";
-import { BookOpen, Flame } from "lucide-react";
+import { Clock, BookOpen, Award, ThumbsUp } from "lucide-react";
+import { useIsDesktop } from "@/_hooks/useMediaQuery";
 
 interface MenteeActivitySummaryProps {
-  totalTasks: number;
   consecutiveDays: number;
+  totalTasks: number;
+  densityExcellence: number;
 }
 
 function StatCard({
@@ -25,24 +29,47 @@ function StatCard({
 }
 
 export default function MenteeActivitySummary({
-  totalTasks,
   consecutiveDays,
+  totalTasks,
+  densityExcellence,
 }: MenteeActivitySummaryProps) {
+  const isDesktop = useIsDesktop();
+
   return (
     <section>
-      <h2 className="text-title-l text-gray-900">학습 현황</h2>
-      <div className="mt-4 grid grid-cols-2 gap-4">
-        <StatCard
-          icon={<BookOpen size={24} className="text-primary-500" />}
-          value={`${totalTasks}개`}
-          label="완료한 과제"
-        />
-        <StatCard
-          icon={<Flame size={24} className="text-primary-500" />}
-          value={`${consecutiveDays}일`}
-          label="연속 학습일"
-        />
-      </div>
+      <h2 className="text-title-l text-gray-900">활동 요약</h2>
+      {isDesktop ? (
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <StatCard
+            icon={<ThumbsUp size={24} className="text-primary-500" />}
+            value={`${totalTasks}개`}
+            label="총 피드백 수"
+          />
+          <StatCard
+            icon={<Clock size={24} className="text-primary-500" />}
+            value={`${consecutiveDays}일`}
+            label="연속 활동일"
+          />
+        </div>
+      ) : (
+        <div className="mt-4 grid grid-cols-3 gap-3">
+          <StatCard
+            icon={<Clock size={24} className="text-primary-500" />}
+            value={`${consecutiveDays}일`}
+            label="연속 학습"
+          />
+          <StatCard
+            icon={<BookOpen size={24} className="text-primary-500" />}
+            value={`${totalTasks}개`}
+            label="완수 과제"
+          />
+          <StatCard
+            icon={<Award size={24} className="text-primary-500" />}
+            value={`${densityExcellence}%`}
+            label="밀도 우수"
+          />
+        </div>
+      )}
     </section>
   );
 }

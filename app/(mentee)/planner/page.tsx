@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Bell } from "lucide-react";
 import React, { useState } from "react";
 import Calendar from "./_components/Calendar";
 import TodayLearning from "./_components/TodayLearning";
@@ -12,7 +12,7 @@ import Card from "../../../components/ui/Card";
 
 function PlannerContent() {
   const { selectedDate } = useSelectedDate();
-  const { data, loading, error } = usePlannerData(selectedDate);
+  const { data, loading, error, refetch } = usePlannerData(selectedDate);
   const [commentText, setCommentText] = useState("");
   const [refetchTrigger, setRefetchTrigger] = useState(0);
 
@@ -60,7 +60,12 @@ function PlannerContent() {
 
   return (
     <article className="mt-7 px-5 lg:px-10">
-      <h3 className="text-heading-xl text-gray-900">유진님의 플래너</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-heading-xl text-gray-900">유진님의 플래너</h3>
+        <button type="button" className="lg:hidden">
+          <Bell size={24} className="text-gray-700" />
+        </button>
+      </div>
       <div className="my-4 mb-8.5 flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-6">
         {/* 왼쪽 섹션 */}
         <div className="flex flex-col gap-3 lg:w-[45%]">
@@ -103,7 +108,7 @@ function PlannerContent() {
             <PlannerQnaCards comments={data.comments} feedback={data.todayFeedback} />
             {/* 피드백이 없을 때 */}
             {!data.todayFeedback && (
-              <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-gray-400 bg-gray-100 p-3 shadow-card">
+              <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-primary-500 bg-primary-50 p-3 shadow-card">
                 <p className="text-title-l text-gray-900">종합 피드백</p>
                 <p className="text-body-m text-gray-700">멘토님의 피드백이 아직 오지 않았어요</p>
               </div>
@@ -112,14 +117,17 @@ function PlannerContent() {
         </div>
         {/* 오른쪽 섹션 / 오늘의 학습 */}
         <div className="lg:flex-1">
-          <TodayLearning tasks={data.tasks} />
+          <TodayLearning tasks={data.tasks} onTaskCreated={refetch} />
         </div>
         {/* 코멘트 & 피드백 섹션 - 모바일 */}
         <section className="flex flex-col gap-3 lg:hidden">
           <PlannerQnaCards comments={data.comments} feedback={data.todayFeedback} />
           {/* 피드백이 없을 때 */}
           {!data.todayFeedback && (
-            <Card title="종합 피드백" description="멘토님의 피드백이 아직 오지 않았어요" />
+            <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-primary-500 bg-primary-50 p-3 shadow-card">
+              <p className="text-title-l text-gray-900">종합 피드백</p>
+              <p className="text-body-m text-gray-700">멘토님의 피드백이 아직 오지 않았어요</p>
+            </div>
           )}
         </section>
       </div>
