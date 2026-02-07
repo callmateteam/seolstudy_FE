@@ -1,110 +1,51 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { mentorApi } from "@/lib/api/mentor";
+import type {
+  DashboardResponse,
+  MenteeListItem,
+  ReviewQueueItem,
+  CommentQueueItem,
+} from "@/lib/api/mentorTypes";
 import MenteeCard from "./_components/MenteeCard";
-import ReviewQueue, { type ReviewItem } from "./_components/ReviewQueue";
-import CommentQueue, { type CommentItem } from "./_components/CommentQueue";
-
-const MENTEES = [
-  {
-    name: "유진",
-    grade: "고2",
-    subjects: ["국어", "영어", "수학"],
-    completionRate: 90,
-    recentDensity: 85,
-  },
-  {
-    name: "이민준",
-    grade: "고2",
-    subjects: ["국어", "수학"],
-    completionRate: 70,
-    recentDensity: 65,
-  },
-];
-
-const REVIEW_ITEMS: ReviewItem[] = [
-  {
-    id: "1",
-    menteeName: "유진",
-    tags: ["국어", "문해력"],
-    studyName: "비문학 독해 3회차",
-    submittedAt: "10:32",
-    elapsedTime: "4h 00m",
-    aiDensityStatus: "success",
-  },
-  {
-    id: "2",
-    menteeName: "유진",
-    tags: ["국어", "문해력"],
-    studyName: "비문학 독해 3회차",
-    submittedAt: "10:32",
-    elapsedTime: "4h 00m",
-    aiDensityStatus: "warning",
-  },
-  {
-    id: "3",
-    menteeName: "유진",
-    tags: ["국어", "문해력"],
-    studyName: "비문학 독해 3회차",
-    submittedAt: "10:32",
-    elapsedTime: "4h 00m",
-    aiDensityStatus: "error",
-  },
-  {
-    id: "4",
-    menteeName: "유진",
-    tags: ["국어", "문해력"],
-    studyName: "비문학 독해 3회차",
-    submittedAt: "10:32",
-    elapsedTime: "4h 00m",
-    aiDensityStatus: null,
-  },
-  {
-    id: "5",
-    menteeName: "유진",
-    tags: ["국어", "문해력"],
-    studyName: "비문학 독해 3회차",
-    submittedAt: "10:32",
-    elapsedTime: "4h 00m",
-    aiDensityStatus: "success",
-  },
-  {
-    id: "6",
-    menteeName: "유진",
-    tags: ["국어", "문해력"],
-    studyName: "비문학 독해 3회차",
-    submittedAt: "10:32",
-    elapsedTime: "4h 00m",
-    aiDensityStatus: "success",
-  },
-  {
-    id: "7",
-    menteeName: "유진",
-    tags: ["국어", "문해력"],
-    studyName: "비문학 독해 3회차",
-    submittedAt: "10:32",
-    elapsedTime: "4h 00m",
-    aiDensityStatus: "success",
-  },
-];
-
-const COMMENT_ITEMS: CommentItem[] = [
-  {
-    id: "1",
-    menteeName: "유진",
-    content: "영어 지문 21번 빈칸 문제 설명 다시 듣...",
-    registeredAt: "10:32",
-    elapsedTime: "4h 00m",
-    replied: false,
-  },
-  {
-    id: "2",
-    menteeName: "유진",
-    content: "영어 지문 21번 빈칸 문제 설명 다시 듣...",
-    registeredAt: "10:32",
-    elapsedTime: "4h 00m",
-    replied: true,
-  },
-];
+import ReviewQueue from "./_components/ReviewQueue";
+import CommentQueue from "./_components/CommentQueue";
 
 export default function Dashboard() {
+  const [mentees, setMentees] = useState<MenteeListItem[]>([]);
+  const [reviewItems, setReviewItems] = useState<ReviewQueueItem[]>([]);
+  const [commentItems, setCommentItems] = useState<CommentQueueItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboard = useCallback(async () => {
+    try {
+      const data: DashboardResponse = await mentorApi.getDashboard();
+      setMentees(data.mentees);
+      setReviewItems(data.reviewQueue);
+      setCommentItems(data.commentQueue);
+    } catch {
+      // 에러 시 빈 상태 유지
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-5 py-10">
+        <h1 className="text-heading-xl text-gray-900">대시보드</h1>
+        <div className="mt-10 flex items-center justify-center py-20">
+          <span className="text-body-m text-gray-400">불러오는 중...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-5 py-10">
       <h1 className="text-heading-xl text-gray-900">대시보드</h1>
@@ -114,8 +55,15 @@ export default function Dashboard() {
         <section className="rounded-2xl bg-white p-6 shadow-card">
           <h2 className="text-title-l text-gray-900">담당 멘티</h2>
           <div className="mt-5 flex flex-col gap-4 lg:flex-row">
-            {MENTEES.map((mentee) => (
-              <MenteeCard key={mentee.name} {...mentee} />
+            {mentees.map((mentee) => (
+              <MenteeCard
+                key={mentee.menteeId}
+                name={mentee.name}
+                grade={mentee.grade ?? ""}
+                subjects={mentee.subjects}
+                completionRate={mentee.completionRate}
+                recentDensity={mentee.recentDensity ?? 0}
+              />
             ))}
           </div>
         </section>
@@ -125,17 +73,22 @@ export default function Dashboard() {
           <section className="flex-1 rounded-2xl bg-white p-6 shadow-card">
             <div className="flex items-center justify-between">
               <h2 className="text-title-l text-gray-900">과제 검토 대기열</h2>
-              <span className="text-label-m text-gray-500 lg:hidden">검토 과제: {REVIEW_ITEMS.length}건</span>
+              <span className="text-label-m text-gray-500 lg:hidden">
+                검토 과제: {reviewItems.length}건
+              </span>
             </div>
             <div className="mt-5">
-              <ReviewQueue items={REVIEW_ITEMS} />
+              <ReviewQueue items={reviewItems} />
             </div>
           </section>
 
           <section className="flex-1 rounded-2xl bg-white p-6 shadow-card">
             <h2 className="text-title-l text-gray-900">코멘트 답변 대기열</h2>
             <div className="mt-5">
-              <CommentQueue items={COMMENT_ITEMS} />
+              <CommentQueue
+                items={commentItems}
+                onRefresh={fetchDashboard}
+              />
             </div>
           </section>
         </div>

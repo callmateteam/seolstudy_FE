@@ -4,13 +4,14 @@ import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import TextArea from "@/components/ui/TextArea";
-import type { CommentItem } from "./CommentQueue";
+import type { CommentQueueItem } from "@/lib/api/mentorTypes";
 
 interface CommentReplyModalProps {
   isOpen: boolean;
   onClose: () => void;
-  comment: CommentItem | null;
+  comment: CommentQueueItem | null;
   onSubmit: (commentId: string, reply: string) => void;
+  loading?: boolean;
 }
 
 export default function CommentReplyModal({
@@ -18,12 +19,13 @@ export default function CommentReplyModal({
   onClose,
   comment,
   onSubmit,
+  loading,
 }: CommentReplyModalProps) {
   const [reply, setReply] = useState("");
 
   const handleSubmit = () => {
     if (!comment || !reply.trim()) return;
-    onSubmit(comment.id, reply);
+    onSubmit(comment.commentId, reply);
     setReply("");
     onClose();
   };
@@ -70,9 +72,9 @@ export default function CommentReplyModal({
               <Button
                 fullWidth
                 onClick={handleSubmit}
-                disabled={!reply.trim()}
+                disabled={!reply.trim() || loading}
               >
-                답변 등록
+                {loading ? "등록 중..." : "답변 등록"}
               </Button>
             </div>
           </div>

@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { ClipboardList, BookOpen, MessageSquare, User } from "lucide-react";
 import { useIsDesktop } from "@/_hooks/useMediaQuery";
 import type { ReactNode } from "react";
+import AuthGuard from "@/components/auth/AuthGuard";
+import { useAuth } from "@/lib/auth";
 
 const DESKTOP_NAV_ITEMS = [
   { label: "대시보드", href: "/dashboard" },
@@ -22,14 +24,16 @@ const MOBILE_NAV_ITEMS = [
 export default function MentoLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isDesktop = useIsDesktop();
+  const { user } = useAuth();
 
   return (
+    <AuthGuard allowedRoles={["MENTOR"]}>
     <div className="min-h-screen">
       {/* 데스크탑 헤더 */}
       {isDesktop && (
         <header className="border-b border-gray-200 bg-white">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5">
-            <Link href="/dashboard" className="text-heading-l text-primary-500">
+            <Link href="/" className="text-heading-l text-primary-500">
               설스터디
             </Link>
             <nav className="flex items-center gap-8">
@@ -54,7 +58,7 @@ export default function MentoLayout({ children }: { children: ReactNode }) {
               <span className="rounded-md bg-primary-500 px-2 py-0.5 text-label-m text-white">
                 멘토
               </span>
-              <span className="text-label-l text-gray-700">김서연</span>
+              <span className="text-label-l text-gray-700">{user?.name ?? ""}</span>
             </Link>
           </div>
         </header>
@@ -88,5 +92,6 @@ export default function MentoLayout({ children }: { children: ReactNode }) {
         </nav>
       )}
     </div>
+    </AuthGuard>
   );
 }

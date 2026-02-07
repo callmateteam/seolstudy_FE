@@ -4,9 +4,10 @@ import Button from "@/components/ui/Button";
 
 interface PersonalInfoStepProps {
   onComplete: (data: { name: string; phone: string }) => void;
+  isLoading?: boolean;
 }
 
-export default function PersonalInfoStep({ onComplete }: PersonalInfoStepProps) {
+export default function PersonalInfoStep({ onComplete, isLoading }: PersonalInfoStepProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
@@ -46,9 +47,9 @@ export default function PersonalInfoStep({ onComplete }: PersonalInfoStepProps) 
         <Button
           fullWidth
           onClick={handleComplete}
-          disabled={!name || !phone}
+          disabled={!name || !phone || isLoading}
         >
-          완료
+          {isLoading ? "가입 중..." : "완료"}
         </Button>
       </div>
     </article>

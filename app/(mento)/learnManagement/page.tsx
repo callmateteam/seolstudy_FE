@@ -1,13 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useIsDesktop } from "@/_hooks/useMediaQuery";
+import { mentorApi } from "@/lib/api/mentor";
+import type { MenteeListItem } from "@/lib/api/mentorTypes";
 import LearningForm from "./_components/LearningForm";
 import RegisteredLearnings from "./_components/RegisteredLearnings";
 
 export default function LearnManagement() {
   const isDesktop = useIsDesktop();
   const [activeTab, setActiveTab] = useState<"form" | "list">("form");
+  const [mentees, setMentees] = useState<MenteeListItem[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    mentorApi.getMentees().then(setMentees).catch(() => {});
+  }, []);
+
+  const handleLearningCreated = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
+
+  const menteeOptions = mentees.map((m) => ({
+    value: m.menteeId,
+    label: `${m.name} (${m.grade ?? ""})`,
+  }));
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10">
@@ -42,8 +59,18 @@ export default function LearnManagement() {
       )}
 
       <div className="mt-10 flex flex-col gap-6 lg:flex-row">
-        {(isDesktop || activeTab === "form") && <LearningForm />}
-        {(isDesktop || activeTab === "list") && <RegisteredLearnings />}
+        {(isDesktop || activeTab === "form") && (
+          <LearningForm
+            menteeOptions={menteeOptions}
+            onCreated={handleLearningCreated}
+          />
+        )}
+        {(isDesktop || activeTab === "list") && (
+          <RegisteredLearnings
+            menteeOptions={menteeOptions}
+            refreshKey={refreshKey}
+          />
+        )}
       </div>
     </div>
   );

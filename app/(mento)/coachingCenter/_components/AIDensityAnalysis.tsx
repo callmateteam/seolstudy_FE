@@ -9,9 +9,22 @@ interface AIDensityAnalysisProps {
   score: number;
   title: string;
   description: string;
+  analysisId?: string | null;
+  detailedAnalysis?: string | null;
+  onConfirmJudgment?: () => void;
+  onModifyJudgment?: () => void;
+  confirmLoading?: boolean;
 }
 
-export default function AIDensityAnalysis({ score, title, description }: AIDensityAnalysisProps) {
+export default function AIDensityAnalysis({
+  score,
+  title,
+  description,
+  detailedAnalysis,
+  onConfirmJudgment,
+  onModifyJudgment,
+  confirmLoading,
+}: AIDensityAnalysisProps) {
   const [showDetail, setShowDetail] = useState(false);
 
   return (
@@ -41,17 +54,27 @@ export default function AIDensityAnalysis({ score, title, description }: AIDensi
         {showDetail && (
           <div className="mt-3 rounded-lg bg-gray-50 p-4">
             <p className="text-body-m text-gray-700">
-              상세 분석 결과가 여기에 표시됩니다.
+              {detailedAnalysis ?? "상세 분석 결과가 여기에 표시됩니다."}
             </p>
           </div>
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <Button variant="primary" outlined fullWidth>
+          <Button
+            variant="primary"
+            outlined
+            fullWidth
+            onClick={onModifyJudgment}
+          >
             판정 수정
           </Button>
-          <Button variant="primary" fullWidth>
-            AI 판정 그대로 확정
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={onConfirmJudgment}
+            disabled={confirmLoading}
+          >
+            {confirmLoading ? "확정 중..." : "AI 판정 그대로 확정"}
           </Button>
         </div>
       </div>

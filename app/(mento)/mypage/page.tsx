@@ -1,36 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { mockGet } from "@/app/mock";
+import { mentorApi } from "@/lib/api/mentor";
+import type { MyPageResponse } from "@/lib/api/mentorTypes";
 import ProfileCard from "./_components/ProfileCard";
 import ActivitySummary from "./_components/ActivitySummary";
 import MenuList from "./_components/MenuList";
 
-interface MentorMyPageData {
-  id: string;
-  role: string;
-  name: string;
-  profileImage: string | null;
-  joinedAt: string;
-  university: string;
-  college: string;
-  department: string;
-  enrollmentStatus: string;
-  subjects: string[];
-  activitySummary: {
-    totalFeedbacks: number;
-    consecutiveDays: number;
-  };
-}
-
 export default function MyPage() {
-  const [data, setData] = useState<MentorMyPageData | null>(null);
+  const [data, setData] = useState<MyPageResponse | null>(null);
 
   useEffect(() => {
     async function fetchData() {
-      const response = await mockGet("/api/my/mentor");
-      if (response.success) {
-        setData(response.data as MentorMyPageData);
+      try {
+        const response = await mentorApi.getMyPage();
+        setData(response);
+      } catch {
+        // 에러 시 빈 상태 유지
       }
     }
     fetchData();

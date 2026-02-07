@@ -2,30 +2,46 @@
 
 import { useState } from "react";
 import Button from "@/components/ui/Button";
+import { mentorApi } from "@/lib/api/mentor";
+import type { CommentQueueItem } from "@/lib/api/mentorTypes";
 import CommentReplyModal from "./CommentReplyModal";
 
-export interface CommentItem {
-  id: string;
-  menteeName: string;
-  content: string;
-  registeredAt: string;
-  elapsedTime: string;
-  replied: boolean;
-}
-
 interface CommentQueueProps {
-  items: CommentItem[];
+  items: CommentQueueItem[];
+  onRefresh?: () => void;
 }
 
-export default function CommentQueue({ items }: CommentQueueProps) {
-  const [selectedComment, setSelectedComment] = useState<CommentItem | null>(
-    null,
-  );
+export default function CommentQueue({ items, onRefresh }: CommentQueueProps) {
+  const [selectedComment, setSelectedComment] =
+    useState<CommentQueueItem | null>(null);
+  const [replying, setReplying] = useState(false);
 
-  const handleReplySubmit = (commentId: string, reply: string) => {
-    // TODO: API 연결
-    console.log("답변 등록:", commentId, reply);
+  const handleReplySubmit = async (commentId: string, reply: string) => {
+    setReplying(true);
+    try {
+      await mentorApi.replyComment(commentId, reply);
+      onRefresh?.();
+    } catch {
+      // 실패 시 조용히 무시 (모달은 이미 닫힘)
+    } finally {
+      setReplying(false);
+    }
   };
+
+  function formatElapsed(minutes: number) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${h}h ${String(m).padStart(2, "0")}m`;
+  }
+
+  function formatTime(dateStr: string) {
+    try {
+      const d = new Date(dateStr);
+      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    } catch {
+      return dateStr;
+    }
+  }
 
   return (
     <>
@@ -52,7 +68,7 @@ export default function CommentQueue({ items }: CommentQueueProps) {
           </thead>
           <tbody>
             {items.map((item) => (
-              <tr key={item.id} className="border-t border-gray-100">
+              <tr key={item.commentId} className="border-t border-gray-100">
                 <td className="px-2 py-3 text-label-m text-gray-900">
                   {item.menteeName}
                 </td>
@@ -60,13 +76,13 @@ export default function CommentQueue({ items }: CommentQueueProps) {
                   {item.content}
                 </td>
                 <td className="hidden px-2 py-3 text-label-m text-gray-700 lg:table-cell">
-                  {item.registeredAt}
+                  {formatTime(item.createdAt)}
                 </td>
                 <td className="px-2 py-3 text-label-m text-gray-700">
-                  {item.elapsedTime}
+                  {formatElapsed(item.elapsedMinutes)}
                 </td>
                 <td className="px-2 py-3">
-                  {item.replied ? (
+                  {item.hasReply ? (
                     <Button size="sm" variant="ghost" outlined>
                       답변완료
                     </Button>
@@ -91,6 +107,7 @@ export default function CommentQueue({ items }: CommentQueueProps) {
         onClose={() => setSelectedComment(null)}
         comment={selectedComment}
         onSubmit={handleReplySubmit}
+        loading={replying}
       />
     </>
   );

@@ -1,40 +1,54 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import Select from "@/components/ui/Select";
 import Chip from "@/components/ui/Chip";
 import Button from "@/components/ui/Button";
+import { mentorApi } from "@/lib/api/mentor";
 
-const MENTEE_OPTIONS = [
-  { value: "yujin", label: "유진 (고2)" },
-  { value: "minjun", label: "이민준 (고2)" },
-];
-
-const SUBJECTS = ["국어", "영어", "수학"];
-
-const COMPETENCY_TAGS = [
-  "문해력",
-  "추론력",
-  "어휘력",
-  "비판적사고",
-  "독해기술",
+const SUBJECTS = [
+  { label: "국어", value: "KOREAN" },
+  { label: "영어", value: "ENGLISH" },
+  { label: "수학", value: "MATH" },
 ];
 
 const MATERIAL_OPTIONS = [
-  { value: "column", label: "설스터디 칼럼" },
-  { value: "textbook", label: "교과서" },
-  { value: "workbook", label: "문제집" },
+  { value: "COLUMN", label: "설스터디 칼럼" },
+  { value: "PDF", label: "PDF 업로드" },
 ];
 
-export default function LearningForm() {
+interface LearningFormProps {
+  menteeOptions: { value: string; label: string }[];
+  onCreated?: () => void;
+}
+
+export default function LearningForm({
+  menteeOptions,
+  onCreated,
+}: LearningFormProps) {
   const [selectedMentee, setSelectedMentee] = useState<string | null>(null);
-  const [date, setDate] = useState("2026-02-01");
-  const [selectedSubject, setSelectedSubject] = useState<string | null>("국어");
-  const [selectedTags, setSelectedTags] = useState<string[]>(["문해력"]);
+  const [date, setDate] = useState(() => {
+    const d = new Date();
+    return d.toISOString().slice(0, 10);
+  });
+  const [selectedSubject, setSelectedSubject] = useState("KOREAN");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [studyName, setStudyName] = useState("");
   const [studyGoal, setStudyGoal] = useState("");
-  const [materialType, setMaterialType] = useState<string | null>("column");
+  const [materialType, setMaterialType] = useState<string | null>("COLUMN");
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // 과목 변경 시 역량 태그 로드
+  useEffect(() => {
+    setSelectedTags([]);
+    mentorApi
+      .getAbilityTags(selectedSubject)
+      .then((res) => setAvailableTags(res.tags))
+      .catch(() => setAvailableTags([]));
+  }, [selectedSubject]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) => {
@@ -42,6 +56,43 @@ export default function LearningForm() {
       if (prev.length >= 3) return prev;
       return [...prev, tag];
     });
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const result = await mentorApi.uploadLessonPdf(file);
+      setUploadedUrl(result.materialUrl);
+    } catch {
+      // 업로드 실패
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedMentee || !studyName.trim()) return;
+    setSubmitting(true);
+    try {
+      await mentorApi.createLesson({
+        menteeId: selectedMentee,
+        date,
+        subject: selectedSubject,
+        abilityTags: selectedTags,
+        title: studyName,
+        goal: studyGoal || undefined,
+        materialUrl: uploadedUrl ?? undefined,
+      });
+      // 초기화
+      setStudyName("");
+      setStudyGoal("");
+      setSelectedTags([]);
+      setUploadedUrl(null);
+      onCreated?.();
+    } catch {
+      // 실패
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -56,7 +107,7 @@ export default function LearningForm() {
               멘티
             </label>
             <Select
-              options={MENTEE_OPTIONS}
+              options={menteeOptions}
               value={selectedMentee}
               placeholder="멘티 선택"
               onChange={setSelectedMentee}
@@ -83,18 +134,18 @@ export default function LearningForm() {
           <div className="flex gap-2">
             {SUBJECTS.map((subject) => (
               <button
-                key={subject}
+                key={subject.value}
                 type="button"
-                onClick={() => setSelectedSubject(subject)}
+                onClick={() => setSelectedSubject(subject.value)}
                 className="cursor-pointer"
               >
                 <Chip
                   variant={
-                    selectedSubject === subject ? "primary" : "default"
+                    selectedSubject === subject.value ? "primary" : "default"
                   }
-                  outlined={selectedSubject === subject}
+                  outlined={selectedSubject === subject.value}
                 >
-                  {subject}
+                  {subject.label}
                 </Chip>
               </button>
             ))}
@@ -107,7 +158,7 @@ export default function LearningForm() {
             과목 역량태그 (최대 3개)
           </label>
           <div className="flex flex-wrap gap-2">
-            {COMPETENCY_TAGS.map((tag) => (
+            {availableTags.map((tag) => (
               <button
                 key={tag}
                 type="button"
@@ -179,16 +230,38 @@ export default function LearningForm() {
           <p className="mt-1 text-body-m text-gray-500">
             PDF 파일을 드래그하거나 클릭하여 업로드해주세요
           </p>
+          {uploadedUrl && (
+            <p className="mt-1 text-body-m text-success-500">
+              업로드 완료
+            </p>
+          )}
           <div className="mt-3">
-            <Button size="sm" variant="primary">
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".pdf"
+              className="hidden"
+              onChange={handleUpload}
+            />
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => fileRef.current?.click()}
+            >
               업로드
             </Button>
           </div>
         </div>
 
         {/* 등록하기 */}
-        <Button size="lg" variant="primary" fullWidth>
-          등록하기
+        <Button
+          size="lg"
+          variant="primary"
+          fullWidth
+          onClick={handleSubmit}
+          disabled={!selectedMentee || !studyName.trim() || submitting}
+        >
+          {submitting ? "등록 중..." : "등록하기"}
         </Button>
       </div>
     </section>

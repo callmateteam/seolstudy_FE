@@ -4,16 +4,14 @@ import Select from "@/components/ui/Select";
 
 interface MenteeSelectorProps {
   mentees: { value: string; label: string }[];
-  dates: { value: string; label: string }[];
   selectedMentee: string | null;
-  selectedDate: string | null;
+  selectedDate: string;
   onMenteeChange: (value: string) => void;
   onDateChange: (value: string) => void;
 }
 
 export default function MenteeSelector({
   mentees,
-  dates,
   selectedMentee,
   selectedDate,
   onMenteeChange,
@@ -32,11 +30,11 @@ export default function MenteeSelector({
       </div>
       <div className="flex flex-col gap-2">
         <span className="text-label-m text-gray-700">날짜</span>
-        <Select
-          options={dates}
+        <input
+          type="date"
           value={selectedDate}
-          placeholder="날짜 선택"
-          onChange={onDateChange}
+          onChange={(e) => onDateChange(e.target.value)}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-body-m text-gray-700"
         />
       </div>
     </div>

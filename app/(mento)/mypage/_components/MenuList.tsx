@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 
 interface MenuItemRow {
   label: string;
@@ -11,10 +11,10 @@ interface MenuItemRow {
 }
 
 export default function MenuList() {
-  const router = useRouter();
+  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    router.push("/login");
+  const handleLogout = async () => {
+    await logout();
   };
 
   const items: MenuItemRow[] = [
