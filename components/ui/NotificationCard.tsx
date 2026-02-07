@@ -9,7 +9,7 @@ interface NotificationCardProps {
 
 export default function NotificationCard({ icon, title, subtitle, action }: NotificationCardProps) {
   return (
-    <div className="flex items-center justify-between gap-2 rounded-[20px] bg-gray-50 p-2 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+    <div className="flex items-center justify-between gap-2 rounded-[20px] bg-gray-50 p-2 shadow-card">
       {icon}
       <div>
         <p className="text-label-s text-gray-500">{subtitle}</p>

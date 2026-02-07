@@ -10,7 +10,7 @@ interface ActivitySummaryProps {
 
 function StatCard({ icon, value, label }: { icon: ReactNode; value: string; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 rounded-xl bg-gray-50 py-5">
+    <div className="flex flex-col items-center gap-1 rounded-xl border border-gray-200 bg-white py-5">
       {icon}
       <span className="text-heading-l text-gray-900">{value}</span>
       <span className="text-label-m text-gray-500">{label}</span>

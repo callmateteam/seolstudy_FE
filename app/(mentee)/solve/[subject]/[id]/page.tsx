@@ -1,16 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ChevronLeft, Pin } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import SolveQuizModal from "./_components/SolveQuizModal";
+import GradingModal from "./_components/GradingModal";
+import GradingCompleteModal from "./_components/GradingCompleteModal";
+import AnswerReviewView from "./_components/AnswerReviewView";
+import PhotoUploadStep from "./_components/PhotoUploadStep";
+import SubmissionComplete from "./_components/SubmissionComplete";
+
+type SolvePhase = "study" | "grading" | "gradingComplete" | "review" | "photoUpload" | "submitted";
+
+const mockReviewProblems = [
+  { id: "q1", number: 1, title: "윗글을 바탕으로 <보기>를 이해한 내용을 적절하지 않은 것은?", passage: "철수는 한겨울 야외에서 운동을 한 뒤 따뜻한 실내로 들어왔다.", options: ["보기 1", "보기 2", "보기 3", "보기 4", "보기 5"], correctIndex: 2, selectedIndex: 2 },
+  { id: "q2", number: 2, title: "윗글을 바탕으로 <보기>를 이해한 내용을 적절하지 않은 것은?", passage: "철수는 한겨울 야외에서 운동을 한 뒤 따뜻한 실내로 들어왔다.", options: ["보기 1", "보기 2", "보기 3", "보기 4", "보기 5"], correctIndex: 1, selectedIndex: 1 },
+  { id: "q3", number: 3, title: "윗글을 바탕으로 <보기>를 이해한 내용을 적절하지 않은 것은?", passage: "철수는 한겨울 야외에서 운동을 한 뒤 따뜻한 실내로 들어왔다.", options: ["보기 1", "보기 2", "보기 3", "보기 4", "보기 5"], correctIndex: 0, selectedIndex: 3 },
+  { id: "q4", number: 4, title: "윗글을 바탕으로 <보기>를 이해한 내용을 적절하지 않은 것은?", passage: "철수는 한겨울 야외에서 운동을 한 뒤 따뜻한 실내로 들어왔다.", options: ["보기 1", "보기 2", "보기 3", "보기 4", "보기 5"], correctIndex: 4, selectedIndex: 4 },
+];
 
 export default function SolvePage() {
   const params = useParams();
   const subject = params.subject as string;
   const id = params.id as string;
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  const [phase, setPhase] = useState<SolvePhase>("study");
   const router = useRouter();
+
+  const handleSubmitAnswers = useCallback((answers: Record<string, number | null>) => {
+    setIsQuizModalOpen(false);
+    setPhase("grading");
+    // 채점 시뮬레이션 (2초 후 완료)
+    setTimeout(() => setPhase("gradingComplete"), 2000);
+  }, []);
 
   return (
     <article className="mt-7 px-5">
@@ -72,7 +94,35 @@ export default function SolvePage() {
       <SolveQuizModal
         isOpen={isQuizModalOpen}
         onClose={() => setIsQuizModalOpen(false)}
+        onSubmit={handleSubmitAnswers}
       />
+      <GradingModal
+        isOpen={phase === "grading"}
+        onClose={() => setPhase("study")}
+      />
+      <GradingCompleteModal
+        isOpen={phase === "gradingComplete"}
+        onClose={() => setPhase("study")}
+        onViewResults={() => setPhase("review")}
+      />
+      {phase === "review" && (
+        <div className="fixed inset-0 z-50 bg-gray-50">
+          <AnswerReviewView
+            problems={mockReviewProblems}
+            onComplete={() => setPhase("photoUpload")}
+          />
+        </div>
+      )}
+      {phase === "photoUpload" && (
+        <div className="fixed inset-0 z-50 bg-gray-50">
+          <PhotoUploadStep onComplete={() => setPhase("submitted")} />
+        </div>
+      )}
+      {phase === "submitted" && (
+        <div className="fixed inset-0 z-50">
+          <SubmissionComplete />
+        </div>
+      )}
     </article>
   );
 }

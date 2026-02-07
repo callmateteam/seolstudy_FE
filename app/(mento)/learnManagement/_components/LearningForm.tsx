@@ -45,7 +45,7 @@ export default function LearningForm() {
   };
 
   return (
-    <section className="flex-1 rounded-2xl bg-white p-6 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+    <section className="flex-1 rounded-2xl bg-white p-6 shadow-card">
       <h2 className="text-heading-l text-gray-900">학습등록</h2>
 
       <div className="mt-6 flex flex-col gap-7">

@@ -71,7 +71,7 @@ export default function TodayLearning({ tasks: apiTasks }: TodayLearningProps) {
   const showOverlay = displayTasks.length > (isDesktop ? 10 : 3) && !isAtBottom;
 
   return (
-    <section className="flex flex-col rounded-xl bg-white shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+    <section className="flex flex-col rounded-xl bg-white shadow-card">
       {/* 타이틀 */}
       <div className="flex items-center justify-between px-3 pt-3">
         <h4 className="text-title-l text-gray-900">오늘 학습</h4>

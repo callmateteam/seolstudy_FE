@@ -131,7 +131,7 @@ export default function Calendar() {
     effectiveViewMode === "weekly" ? weekDays[0].date.getMonth() : currentDate.getMonth();
 
   return (
-    <div className="my-3 rounded-2xl bg-white p-4 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+    <div className="my-3 rounded-2xl bg-white p-4 shadow-card">
       {/* 헤더: Today | < YYYY.MM > | 뷰 토글 */}
       <div className="flex items-center justify-between">
         {effectiveViewMode === "monthly" ? (

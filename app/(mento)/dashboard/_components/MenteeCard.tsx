@@ -25,7 +25,7 @@ export default function MenteeCard({
   const clampedDensity = Math.min(100, Math.max(0, recentDensity));
 
   return (
-    <div className="flex w-68.25 flex-col gap-5 rounded-xl border border-gray-200 bg-white p-6">
+    <div className="flex w-full flex-col gap-5 rounded-xl border border-gray-200 bg-white p-6 lg:w-68.25">
       <div className="flex items-center gap-4">
         <Avatar initials={name.charAt(0)} variant="default" size="lg" />
         <div className="flex flex-col">

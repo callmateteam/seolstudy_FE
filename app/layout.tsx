@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { pretendard } from "./fonts";
+import { ToastProvider } from "@/components/ui/Toast";
 
 export const metadata: Metadata = {
   title: "Seolstudy",
@@ -14,7 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={pretendard.variable}>{children}</body>
+      <body className={pretendard.variable}>
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

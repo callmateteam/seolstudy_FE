@@ -66,7 +66,7 @@ function PlannerContent() {
         <div className="flex flex-col gap-3 lg:w-[45%]">
           {/* 피드백 도착 */}
           {data.hasYesterdayFeedback && data.yesterdayFeedbackDate && (
-            <div className="flex items-center justify-between gap-2 rounded-4xl bg-gray-50 p-2 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+            <div className="flex items-center justify-between gap-2 rounded-4xl bg-gray-50 p-2 shadow-card">
               <MessageCircle />
               <div>
                 <p className="text-label-s text-gray-500">{data.yesterdayFeedbackDate}</p>
@@ -80,7 +80,7 @@ function PlannerContent() {
           {/* 캘린더 */}
           <Calendar />
           {/* 질문 및 코멘트 */}
-          <div className="flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+          <div className="flex items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 shadow-card">
             <input
               type="text"
               value={commentText}
@@ -103,7 +103,7 @@ function PlannerContent() {
             <PlannerQnaCards comments={data.comments} feedback={data.todayFeedback} />
             {/* 피드백이 없을 때 */}
             {!data.todayFeedback && (
-              <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-gray-400 bg-gray-100 p-3 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+              <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-gray-400 bg-gray-100 p-3 shadow-card">
                 <p className="text-title-l text-gray-900">종합 피드백</p>
                 <p className="text-body-m text-gray-700">멘토님의 피드백이 아직 오지 않았어요</p>
               </div>

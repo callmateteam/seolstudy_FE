@@ -1,5 +1,4 @@
 import Avatar from "@/components/ui/Avatar";
-import Button from "@/components/ui/Button";
 import { Pencil } from "lucide-react";
 
 const SUBJECT_LABELS: Record<string, string> = {
@@ -37,7 +36,7 @@ export default function ProfileCard({ data }: ProfileCardProps) {
   const subjectsStr = data.subjects.map((s) => SUBJECT_LABELS[s] ?? s).join(" · ");
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+    <div className="rounded-2xl border border-gray-200 bg-white p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Avatar
@@ -48,9 +47,13 @@ export default function ProfileCard({ data }: ProfileCardProps) {
           />
           <h2 className="text-heading-l text-gray-900">{data.name}</h2>
         </div>
-        <Button variant="ghost" size="sm" icon={<Pencil size={14} />}>
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-1 text-label-m text-gray-500"
+        >
+          <Pencil size={14} />
           수정
-        </Button>
+        </button>
       </div>
 
       <div className="mt-4 flex flex-col gap-2">

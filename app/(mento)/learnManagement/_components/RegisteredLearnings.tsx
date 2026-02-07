@@ -92,7 +92,7 @@ export default function RegisteredLearnings() {
   };
 
   return (
-    <section className="flex-1 rounded-2xl bg-white p-6 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+    <section className="flex-1 rounded-2xl bg-white p-6 shadow-card">
       <h2 className="text-heading-l text-gray-900">등록된 학습</h2>
 
       <div className="mt-6 flex flex-col gap-7">
@@ -164,7 +164,7 @@ export default function RegisteredLearnings() {
                     {menuOpenId === item.id && (
                       <div
                         ref={menuRef}
-                        className="absolute left-0 z-10 mt-1 rounded-lg border border-gray-200 bg-white py-1 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]"
+                        className="absolute left-0 z-10 mt-1 rounded-lg border border-gray-200 bg-white py-1 shadow-card"
                       >
                         <button
                           type="button"
@@ -202,7 +202,7 @@ export default function RegisteredLearnings() {
 
       {/* 토스트 */}
       {toast && (
-        <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+        <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-card">
           <span className="text-body-m text-gray-700">삭제되었습니다.</span>
           <button
             type="button"

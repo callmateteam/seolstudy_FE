@@ -111,9 +111,9 @@ export default function Dashboard() {
 
       <div className="mt-10 flex flex-col gap-10">
         {/* 담당 멘티 */}
-        <section className="rounded-2xl bg-white p-6 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+        <section className="rounded-2xl bg-white p-6 shadow-card">
           <h2 className="text-title-l text-gray-900">담당 멘티</h2>
-          <div className="mt-5 flex gap-4">
+          <div className="mt-5 flex flex-col gap-4 lg:flex-row">
             {MENTEES.map((mentee) => (
               <MenteeCard key={mentee.name} {...mentee} />
             ))}
@@ -121,15 +121,18 @@ export default function Dashboard() {
         </section>
 
         {/* 과제 검토 대기열 + 코멘트 답변 대기열 */}
-        <div className="flex gap-6">
-          <section className="flex-1 rounded-2xl bg-white p-6 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
-            <h2 className="text-title-l text-gray-900">과제 검토 대기열</h2>
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <section className="flex-1 rounded-2xl bg-white p-6 shadow-card">
+            <div className="flex items-center justify-between">
+              <h2 className="text-title-l text-gray-900">과제 검토 대기열</h2>
+              <span className="text-label-m text-gray-500 lg:hidden">검토 과제: {REVIEW_ITEMS.length}건</span>
+            </div>
             <div className="mt-5">
               <ReviewQueue items={REVIEW_ITEMS} />
             </div>
           </section>
 
-          <section className="flex-1 rounded-2xl bg-white p-6 shadow-[1px_1px_4px_2px_rgba(0,0,0,0.08)]">
+          <section className="flex-1 rounded-2xl bg-white p-6 shadow-card">
             <h2 className="text-title-l text-gray-900">코멘트 답변 대기열</h2>
             <div className="mt-5">
               <CommentQueue items={COMMENT_ITEMS} />

@@ -39,7 +39,7 @@ export default function ReviewQueue({ items }: ReviewQueueProps) {
             <th className="px-2 py-2 text-left text-label-m text-gray-500">
               학습명
             </th>
-            <th className="px-2 py-2 text-left text-label-m text-gray-500">
+            <th className="hidden px-2 py-2 text-left text-label-m text-gray-500 lg:table-cell">
               제출시각
             </th>
             <th className="px-2 py-2 text-left text-label-m text-gray-500">
@@ -68,7 +68,7 @@ export default function ReviewQueue({ items }: ReviewQueueProps) {
               <td className="px-2 py-3 text-label-m text-gray-700">
                 {item.studyName}
               </td>
-              <td className="px-2 py-3 text-label-m text-gray-700">
+              <td className="hidden px-2 py-3 text-label-m text-gray-700 lg:table-cell">
                 {item.submittedAt}
               </td>
               <td className="px-2 py-3 text-label-m text-gray-700">
