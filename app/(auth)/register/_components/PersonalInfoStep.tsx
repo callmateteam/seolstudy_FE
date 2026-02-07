@@ -21,7 +21,7 @@ export default function PersonalInfoStep({ onComplete }: PersonalInfoStepProps) 
         <h1 className="text-heading-xl text-gray-900">
           본인 확인을 진행해주세요
         </h1>
-        <p className="text-label-m mt-1 text-gray-500">
+        <p className="text-title-l mt-1 text-gray-500">
           역할에 따라 필요한 정보만 안내해드릴게요.
         </p>
       </section>

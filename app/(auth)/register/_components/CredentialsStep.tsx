@@ -49,7 +49,6 @@ export default function CredentialsStep({ onNext }: CredentialsStepProps) {
             </div>
             <Button
               variant="ghost"
-              outlined
               onClick={handleCheckDuplicate}
             >
               중복확인
