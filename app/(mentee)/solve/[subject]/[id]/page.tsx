@@ -15,6 +15,7 @@ import TimeRecordModal from "./_components/TimeRecordModal";
 import SubmissionComplete from "./_components/SubmissionComplete";
 import Button from "@/components/ui/Button";
 import { menteeApi } from "@/lib/api/mentee";
+import { plannerApi } from "@/lib/api/plannerApi";
 import type { TaskResponse, TaskProblemResponse } from "@/lib/api/menteeTypes";
 
 type SolvePhase =
@@ -84,6 +85,7 @@ export default function SolvePage({
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [studyTimeMinutes, setStudyTimeMinutes] = useState(0);
   const [commentText, setCommentText] = useState("");
+  const [commentStatus, setCommentStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   useEffect(() => {
     menteeApi
@@ -155,14 +157,15 @@ export default function SolvePage({
 
   const handleCommentSubmit = async () => {
     if (!task || !commentText.trim()) return;
+    setCommentStatus("sending");
     try {
-      await menteeApi.submitTask(task.id, {
-        submissionType: "TEXT",
-        comment: commentText.trim(),
-      });
+      await plannerApi.addComment(task.date, commentText.trim());
       setCommentText("");
+      setCommentStatus("sent");
+      setTimeout(() => setCommentStatus("idle"), 2000);
     } catch {
-      // 실패
+      setCommentStatus("error");
+      setTimeout(() => setCommentStatus("idle"), 2000);
     }
   };
 
@@ -368,9 +371,12 @@ export default function SolvePage({
               <button
                 type="button"
                 onClick={handleCommentSubmit}
-                className="shrink-0 rounded-lg bg-primary-500 px-4 py-2 text-label-l text-white"
+                disabled={commentStatus === "sending"}
+                className={`shrink-0 rounded-lg px-4 py-2 text-label-l text-white ${
+                  commentStatus === "sending" ? "bg-gray-400" : "bg-primary-500"
+                }`}
               >
-                등록
+                {commentStatus === "sending" ? "전송중..." : commentStatus === "sent" ? "등록완료!" : commentStatus === "error" ? "실패" : "등록"}
               </button>
             </div>
           </div>
@@ -407,9 +413,12 @@ export default function SolvePage({
             <button
               type="button"
               onClick={handleCommentSubmit}
-              className="shrink-0 rounded-lg bg-primary-500 px-4 py-2 text-label-l text-white"
+              disabled={commentStatus === "sending"}
+              className={`shrink-0 rounded-lg px-4 py-2 text-label-l text-white ${
+                commentStatus === "sending" ? "bg-gray-400" : "bg-primary-500"
+              }`}
             >
-              등록
+              {commentStatus === "sending" ? "전송중..." : commentStatus === "sent" ? "등록완료!" : commentStatus === "error" ? "실패" : "등록"}
             </button>
           </div>
         </section>

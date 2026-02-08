@@ -91,12 +91,12 @@ export default function Feedback() {
     overallScore,
     scoreLabel: getScoreLabel(overallScore),
     scoreDescription: getScoreDescription(overallScore),
-    writingRatio: analysis?.writingRatio != null ? Math.round(analysis.writingRatio * 100) : 0,
+    writingRatio: analysis?.writingRatio != null ? Math.min(100, Math.max(0, Math.round(analysis.writingRatio * 100))) : 0,
     traceTypes: analysis?.traceTypes
       ? [
-          { label: "밑줄/메모", value: Math.round(analysis.traceTypes.underlineRatio * 100) },
-          { label: "메모/요약", value: Math.round(analysis.traceTypes.memoRatio * 100) },
-          { label: "풀이 과정", value: Math.round(analysis.traceTypes.solutionRatio * 100) },
+          { label: "밑줄/메모", value: Math.min(100, Math.max(0, Math.round(analysis.traceTypes.underlineRatio * 100))) },
+          { label: "메모/요약", value: Math.min(100, Math.max(0, Math.round(analysis.traceTypes.memoRatio * 100))) },
+          { label: "풀이 과정", value: Math.min(100, Math.max(0, Math.round(analysis.traceTypes.solutionRatio * 100))) },
         ]
       : [],
     partDensity: analysis?.partDensity
