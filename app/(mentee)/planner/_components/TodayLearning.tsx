@@ -129,7 +129,7 @@ export default function TodayLearning({ tasks: apiTasks, onTaskCreated }: TodayL
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex flex-col gap-5 overflow-y-auto px-3 pt-5"
+          className="flex flex-col gap-5 overflow-y-auto px-3 pt-5 pb-5"
           style={{ maxHeight: isDesktop ? "500px" : "200px" }}
         >
           {displayTasks.map((task, index) => {

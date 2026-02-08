@@ -68,6 +68,7 @@ export default function CoachingCenter() {
   const [detailedFeedback, setDetailedFeedback] = useState("");
   const [learningReview, setLearningReview] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [triggerLoading, setTriggerLoading] = useState(false);
   const [sendingFeedback, setSendingFeedback] = useState(false);
   const [assignedMaterialIds, setAssignedMaterialIds] = useState<Set<string>>(
     new Set(),
@@ -161,8 +162,27 @@ export default function CoachingCenter() {
     label: `${m.name} (${GRADE_DISPLAY[m.grade ?? ""] ?? m.grade ?? ""})`,
   }));
 
-  // 사진
-  const photos = selectedTask?.submission?.images ?? [];
+  // 사진 (presigned URL 변환)
+  const [presignedPhotos, setPresignedPhotos] = useState<string[]>([]);
+
+  useEffect(() => {
+    const rawPhotos = selectedTask?.submission?.images ?? [];
+    if (rawPhotos.length === 0) {
+      setPresignedPhotos([]);
+      return;
+    }
+
+    Promise.all(
+      rawPhotos.map(async (url) => {
+        try {
+          const res = await mentorApi.getPresignedUrl(url);
+          return res.presignedUrl;
+        } catch {
+          return url;
+        }
+      }),
+    ).then(setPresignedPhotos);
+  }, [selectedTask]);
 
   // AI 분석
   const analysis = selectedTask?.analysis;
@@ -179,6 +199,21 @@ export default function CoachingCenter() {
       // 실패
     } finally {
       setConfirmLoading(false);
+    }
+  };
+
+  // AI 분석 실행
+  const handleTriggerAnalysis = async () => {
+    const submissionId = selectedTask?.submission?.id;
+    if (!submissionId) return;
+    setTriggerLoading(true);
+    try {
+      await mentorApi.triggerAnalysis(submissionId);
+      fetchSession();
+    } catch {
+      // 실패
+    } finally {
+      setTriggerLoading(false);
     }
   };
 
@@ -320,7 +355,7 @@ export default function CoachingCenter() {
               selectedTask?.submission?.comment ?? "코멘트가 없습니다."
             }
           />
-          <PhotoGallery photos={photos} total={photos.length || 1} />
+          <PhotoGallery photos={presignedPhotos} total={presignedPhotos.length || 1} />
           <AIDensityAnalysis
             score={densityScore}
             title={getScoreTitle(analysis?.densityScore ?? null)}
@@ -329,6 +364,8 @@ export default function CoachingCenter() {
             detailedAnalysis={analysis?.detailedAnalysis}
             onConfirmJudgment={handleConfirmJudgment}
             confirmLoading={confirmLoading}
+            onTriggerAnalysis={handleTriggerAnalysis}
+            triggerLoading={triggerLoading}
           />
         </div>
 

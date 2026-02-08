@@ -83,6 +83,7 @@ export default function SolvePage({
   const [answers, setAnswers] = useState<Record<string, number | null>>({});
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [studyTimeMinutes, setStudyTimeMinutes] = useState(0);
+  const [commentText, setCommentText] = useState("");
 
   useEffect(() => {
     menteeApi
@@ -149,6 +150,19 @@ export default function SolvePage({
       setPhase("submitted");
     } catch {
       alert("제출에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!task || !commentText.trim()) return;
+    try {
+      await menteeApi.submitTask(task.id, {
+        submissionType: "TEXT",
+        comment: commentText.trim(),
+      });
+      setCommentText("");
+    } catch {
+      // 실패
     }
   };
 
@@ -346,11 +360,14 @@ export default function SolvePage({
             <div className="mt-5 flex items-center gap-2 border-t border-gray-200 pt-4">
               <input
                 type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
                 placeholder="멘토에게 할 질문이나 코멘트를 남겨보세요"
                 className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-body-m text-gray-700 outline-none placeholder:text-gray-400 focus:border-primary-500"
               />
               <button
                 type="button"
+                onClick={handleCommentSubmit}
                 className="shrink-0 rounded-lg bg-primary-500 px-4 py-2 text-label-l text-white"
               >
                 등록
@@ -382,11 +399,14 @@ export default function SolvePage({
           <div className="mt-5 flex items-center gap-2 border-t border-gray-200 pt-4">
             <input
               type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
               placeholder="멘토에게 할 질문이나 코멘트를 남겨보세요"
               className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-body-m text-gray-700 outline-none placeholder:text-gray-400 focus:border-primary-500"
             />
             <button
               type="button"
+              onClick={handleCommentSubmit}
               className="shrink-0 rounded-lg bg-primary-500 px-4 py-2 text-label-l text-white"
             >
               등록

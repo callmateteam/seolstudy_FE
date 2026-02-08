@@ -14,6 +14,8 @@ interface AIDensityAnalysisProps {
   onConfirmJudgment?: () => void;
   onModifyJudgment?: () => void;
   confirmLoading?: boolean;
+  onTriggerAnalysis?: () => void;
+  triggerLoading?: boolean;
 }
 
 export default function AIDensityAnalysis({
@@ -24,6 +26,8 @@ export default function AIDensityAnalysis({
   onConfirmJudgment,
   onModifyJudgment,
   confirmLoading,
+  onTriggerAnalysis,
+  triggerLoading,
 }: AIDensityAnalysisProps) {
   const [showDetail, setShowDetail] = useState(false);
 
@@ -60,22 +64,35 @@ export default function AIDensityAnalysis({
         )}
 
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <Button
-            variant="primary"
-            outlined
-            fullWidth
-            onClick={onModifyJudgment}
-          >
-            판정 수정
-          </Button>
-          <Button
-            variant="primary"
-            fullWidth
-            onClick={onConfirmJudgment}
-            disabled={confirmLoading}
-          >
-            {confirmLoading ? "확정 중..." : "AI 판정 그대로 확정"}
-          </Button>
+          {score === 0 && onTriggerAnalysis ? (
+            <Button
+              variant="primary"
+              fullWidth
+              onClick={onTriggerAnalysis}
+              disabled={triggerLoading}
+            >
+              {triggerLoading ? "분석 실행 중..." : "AI 분석 실행"}
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="primary"
+                outlined
+                fullWidth
+                onClick={onModifyJudgment}
+              >
+                판정 수정
+              </Button>
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={onConfirmJudgment}
+                disabled={confirmLoading}
+              >
+                {confirmLoading ? "확정 중..." : "AI 판정 그대로 확정"}
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
