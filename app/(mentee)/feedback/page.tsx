@@ -11,6 +11,8 @@ import { Lightbulb } from "lucide-react";
 import FeedbackAnalysisView from "./_components/FeedbackAnalysisView";
 import { feedbackApi } from "@/lib/api/feedbackApi";
 import type { FeedbackBySubjectItem, FeedbackItemWithAnalysis } from "@/lib/api/parentTypes";
+import { menteeApi } from "@/lib/api/mentee";
+import type { AnalysisResponse } from "@/lib/api/menteeTypes";
 import { useAuth } from "@/lib/auth";
 
 const SUBJECTS = [
@@ -48,34 +50,72 @@ export default function Feedback() {
       .finally(() => setLoading(false));
   }, [menteeId, selectedSubject]);
 
-  const handleShowAnalysis = (item: FeedbackItemWithAnalysis) => {
+  const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+
+  const handleShowAnalysis = async (item: FeedbackItemWithAnalysis) => {
     setSelectedItem(item);
+    setAnalysis(null);
+
+    if (item.submissionId) {
+      setAnalysisLoading(true);
+      try {
+        const result = await menteeApi.getAnalysis(item.submissionId);
+        setAnalysis(result);
+      } catch {
+        // 분석 데이터 없으면 null 유지
+      } finally {
+        setAnalysisLoading(false);
+      }
+    }
+
     setShowAnalysis(true);
   };
 
+  function getScoreLabel(score: number): string {
+    if (score >= 80) return "밀도 높은 학습!";
+    if (score >= 60) return "양호한 학습";
+    return "보완이 필요해요";
+  }
+
+  function getScoreDescription(score: number): string {
+    if (score >= 80) return "풀이 과정이 충실합니다";
+    if (score >= 60) return "조금 더 꼼꼼하게 풀어보세요";
+    return "풀이 흔적을 더 남겨보세요";
+  }
+
+  const overallScore = analysis?.densityScore ?? selectedItem?.densityScore ?? 0;
+
   const analysisData = {
-    taskTitle: selectedItem?.taskTitle ?? "비문학 독해 3회차",
-    overallScore: selectedItem?.densityScore ?? 85,
-    scoreLabel: "밀도 높은 학습!",
-    scoreDescription: "풀이 과정이 충실합니다",
-    writingRatio: 90,
-    traceTypes: [
-      { label: "밑줄/메모", value: 90 },
-      { label: "풀이 과정", value: 85 },
-    ],
-    partDensity: [
-      { part: "part 1", score: 92 },
-      { part: "part 2", score: 92 },
-      { part: "part 3", score: 75 },
-      { part: "part 4", score: 92 },
-    ],
-    mentorFeedback:
-      selectedItem?.aiSummary ??
-      "전반적으로 독해 속도와 정확도가 향상되고 있어요. 이 페이스를 유지하면 좋겠습니다. 특히 비교/대조 구조의 지문은 표로 정리하는 연습도 추천합니다.",
+    taskTitle: selectedItem?.taskTitle ?? "",
+    overallScore,
+    scoreLabel: getScoreLabel(overallScore),
+    scoreDescription: getScoreDescription(overallScore),
+    writingRatio: analysis?.writingRatio != null ? Math.round(analysis.writingRatio * 100) : 0,
+    traceTypes: analysis?.traceTypes
+      ? [
+          { label: "밑줄/메모", value: Math.round(analysis.traceTypes.underlineRatio * 100) },
+          { label: "메모/요약", value: Math.round(analysis.traceTypes.memoRatio * 100) },
+          { label: "풀이 과정", value: Math.round(analysis.traceTypes.solutionRatio * 100) },
+        ]
+      : [],
+    partDensity: analysis?.partDensity
+      ? analysis.partDensity.map((p) => ({ part: p.partTitle, score: p.density }))
+      : [],
+    mentorFeedback: analysis?.summary ?? selectedItem?.aiSummary ?? "",
   };
 
   // 분석 결과 뷰 표시
   if (showAnalysis) {
+    if (analysisLoading) {
+      return (
+        <article className="mt-7 px-5">
+          <div className="flex items-center justify-center py-20">
+            <p className="text-body-m text-gray-500">분석 결과 불러오는 중...</p>
+          </div>
+        </article>
+      );
+    }
     return (
       <FeedbackAnalysisView
         onBack={() => setShowAnalysis(false)}
