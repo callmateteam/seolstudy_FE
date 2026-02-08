@@ -69,6 +69,7 @@ export default function CoachingCenter() {
   const [learningReview, setLearningReview] = useState("");
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [triggerLoading, setTriggerLoading] = useState(false);
+  const [modifyLoading, setModifyLoading] = useState(false);
   const [sendingFeedback, setSendingFeedback] = useState(false);
   const [assignedMaterialIds, setAssignedMaterialIds] = useState<Set<string>>(
     new Set(),
@@ -124,6 +125,7 @@ export default function CoachingCenter() {
   // 과제 변경 시 상세 피드백 로드
   const handleSelectTask = (id: string) => {
     setSelectedTaskId(id);
+    setJudgmentScore(null);
     const task = session?.tasks.find((t) => t.id === id);
     setDetailedFeedback(task?.detailFeedback ?? "");
   };
@@ -186,7 +188,23 @@ export default function CoachingCenter() {
 
   // AI 분석
   const analysis = selectedTask?.analysis;
-  const densityScore = analysis?.densityScore ?? 0;
+  const [judgmentScore, setJudgmentScore] = useState<number | null>(null);
+
+  // 기존 판정 점수 로드
+  useEffect(() => {
+    if (!analysis?.id) {
+      setJudgmentScore(null);
+      return;
+    }
+    mentorApi
+      .getJudgment(analysis.id)
+      .then((j) => {
+        setJudgmentScore(j.isModified ? j.finalScore : null);
+      })
+      .catch(() => setJudgmentScore(null));
+  }, [analysis?.id]);
+
+  const densityScore = judgmentScore ?? (analysis?.densityScore ?? 0);
 
   // 판정 확정
   const handleConfirmJudgment = async () => {
@@ -214,6 +232,25 @@ export default function CoachingCenter() {
       // 실패
     } finally {
       setTriggerLoading(false);
+    }
+  };
+
+  // 판정 수정
+  const handleModifyJudgment = async (score: number, reason: string) => {
+    if (!analysis?.id) return;
+    setModifyLoading(true);
+    try {
+      await mentorApi.modifyJudgment(analysis.id, {
+        signalLight: score >= 80 ? "GREEN" : score >= 40 ? "YELLOW" : "RED",
+        score,
+        reason,
+      });
+      setJudgmentScore(score);
+      fetchSession();
+    } catch {
+      // 실패
+    } finally {
+      setModifyLoading(false);
     }
   };
 
@@ -358,12 +395,15 @@ export default function CoachingCenter() {
           <PhotoGallery photos={presignedPhotos} total={presignedPhotos.length || 1} />
           <AIDensityAnalysis
             score={densityScore}
-            title={getScoreTitle(analysis?.densityScore ?? null)}
-            description={getScoreDescription(analysis?.densityScore ?? null)}
+            title={getScoreTitle(densityScore)}
+            description={getScoreDescription(densityScore)}
             analysisId={analysis?.id}
             detailedAnalysis={analysis?.detailedAnalysis}
+            partDensity={analysis?.partDensity}
             onConfirmJudgment={handleConfirmJudgment}
+            onModifyJudgment={handleModifyJudgment}
             confirmLoading={confirmLoading}
+            modifyLoading={modifyLoading}
             onTriggerAnalysis={handleTriggerAnalysis}
             triggerLoading={triggerLoading}
           />
