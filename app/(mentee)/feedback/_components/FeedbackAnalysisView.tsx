@@ -106,9 +106,9 @@ export default function FeedbackAnalysisView({
         <div>
           <p className="text-body-m font-medium text-gray-700">파트별 밀도 히트맵</p>
           <div className="mt-3 flex flex-wrap gap-3">
-            {data.partDensity.map((part) => (
+            {data.partDensity.map((part, idx) => (
               <div
-                key={part.part}
+                key={`${part.part}-${idx}`}
                 className={`flex flex-col items-center rounded-xl border px-4 py-2.5 ${getChipColor(part.score)} ${getChipBorder(part.score)}`}
               >
                 <span className="text-label-s">{part.part}</span>

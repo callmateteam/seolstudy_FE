@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useIsDesktop } from "@/_hooks/useMediaQuery";
 import { menteeApi } from "@/lib/api/mentee";
 import type { MenteeMyPageResponse } from "@/lib/api/menteeTypes";
 import MenteeProfileCard from "./_components/MenteeProfileCard";
@@ -44,9 +45,13 @@ function mapSubjectStats(stats: MenteeMyPageResponse["subjectStats"]): SubjectDa
   });
 }
 
+const CONSULTATION_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSfgdWIKLyMFdZdyLI9FaxO3ix1ZdLeKmta4TB-U0VwK1B6UCg/viewform";
+
 export default function MenteeMyPage() {
   const [data, setData] = useState<MenteeMyPageResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const isDesktop = useIsDesktop();
 
   useEffect(() => {
     menteeApi
@@ -108,6 +113,17 @@ export default function MenteeMyPage() {
         />
         <MenteeMenuList />
       </div>
+
+      <a
+        href={CONSULTATION_FORM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`fixed z-50 rounded-lg bg-primary-500 px-6 py-3.5 text-title-l text-white shadow-lg hover:opacity-90 ${
+          isDesktop ? "right-8 bottom-8" : "right-5 bottom-20"
+        }`}
+      >
+        상담 받아보기
+      </a>
     </article>
   );
 }
