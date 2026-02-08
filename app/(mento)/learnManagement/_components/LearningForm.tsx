@@ -38,6 +38,9 @@ export default function LearningForm({
   const [studyGoal, setStudyGoal] = useState("");
   const [materialType, setMaterialType] = useState<string | null>("COLUMN");
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -61,11 +64,16 @@ export default function LearningForm({
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setUploading(true);
+    setUploadError(null);
     try {
       const result = await mentorApi.uploadLessonPdf(file);
       setUploadedUrl(result.materialUrl);
+      setUploadedFileName(result.originalName || file.name);
     } catch {
-      // 업로드 실패
+      setUploadError("업로드에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -87,6 +95,8 @@ export default function LearningForm({
       setStudyGoal("");
       setSelectedTags([]);
       setUploadedUrl(null);
+      setUploadedFileName(null);
+      setUploadError(null);
       onCreated?.();
     } catch {
       // 실패
@@ -230,9 +240,19 @@ export default function LearningForm({
           <p className="mt-1 text-body-m text-gray-500">
             PDF 파일을 드래그하거나 클릭하여 업로드해주세요
           </p>
-          {uploadedUrl && (
+          {uploading && (
+            <p className="mt-1 text-body-m text-gray-500">
+              업로드 중...
+            </p>
+          )}
+          {uploadedUrl && uploadedFileName && (
             <p className="mt-1 text-body-m text-success-500">
-              업로드 완료
+              {uploadedFileName} 업로드 완료
+            </p>
+          )}
+          {uploadError && (
+            <p className="mt-1 text-body-m text-red-500">
+              {uploadError}
             </p>
           )}
           <div className="mt-3">
@@ -247,8 +267,9 @@ export default function LearningForm({
               size="sm"
               variant="primary"
               onClick={() => fileRef.current?.click()}
+              disabled={uploading}
             >
-              업로드
+              {uploading ? "업로드 중..." : uploadedUrl ? "다시 업로드" : "업로드"}
             </Button>
           </div>
         </div>

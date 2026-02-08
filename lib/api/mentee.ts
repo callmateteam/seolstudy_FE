@@ -8,6 +8,7 @@ import type {
   SubmissionCreateRequest,
   SubmissionResponse,
   StudyPhotoResponse,
+  AnalysisResponse,
 } from "./menteeTypes";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -34,6 +35,10 @@ export const menteeApi = {
   /** PATCH /api/tasks/{taskId}/study-time — 학습 시간 기록 */
   recordStudyTime: (taskId: string, minutes: number) =>
     api.patch(`/api/tasks/${taskId}/study-time`, { minutes }),
+
+  /** GET /api/analysis/{submissionId} — 분석 결과 조회 */
+  getAnalysis: (submissionId: string) =>
+    api.get<AnalysisResponse>(`/api/analysis/${submissionId}`),
 
   /** PATCH /api/tasks/{taskId}/bookmark — 북마크 토글 */
   toggleBookmark: (taskId: string, isBookmarked: boolean) =>

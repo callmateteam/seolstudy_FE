@@ -136,6 +136,37 @@ export interface SubmissionResponse {
   submittedAt: string;
 }
 
+// ===== Analysis 관련 =====
+
+export interface TraceTypesData {
+  underlineRatio: number;
+  memoRatio: number;
+  solutionRatio: number;
+}
+
+export interface PartDensityItem {
+  partNumber: number;
+  partTitle: string;
+  density: number;
+}
+
+export interface AnalysisResponse {
+  id: string;
+  submissionId: string;
+  status: string;
+  signalLight: string | null;
+  densityScore: number | null;
+  writingRatio: number | null;
+  traceTypes: TraceTypesData | null;
+  partDensity: PartDensityItem[] | null;
+  pageHeatmap: unknown | null;
+  summary: string | null;
+  detailedAnalysis: string | null;
+  mentorTip: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ===== Upload 관련 =====
 
 export interface StudyPhotoResponse {

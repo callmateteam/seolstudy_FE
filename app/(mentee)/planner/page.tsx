@@ -2,6 +2,7 @@
 
 import { MessageCircle, Bell } from "lucide-react";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Calendar from "./_components/Calendar";
 import TodayLearning from "./_components/TodayLearning";
 import PlannerQnaCards from "./_components/PlannerQnaCards";
@@ -11,6 +12,7 @@ import { useCommentActions } from "./_hooks/useCommentActions";
 import Card from "../../../components/ui/Card";
 
 function PlannerContent() {
+  const router = useRouter();
   const { selectedDate } = useSelectedDate();
   const { data, loading, error, refetch } = usePlannerData(selectedDate);
   const [commentText, setCommentText] = useState("");
@@ -77,7 +79,10 @@ function PlannerContent() {
                 <p className="text-label-s text-gray-500">{data.yesterdayFeedbackDate}</p>
                 <p className="text-body-m text-gray-700">멘토님의 피드백이 도착했어요!</p>
               </div>
-              <button className="bg-primary-500 text-label-m rounded-lg p-2 text-white">
+              <button
+                onClick={() => router.push("/feedback")}
+                className="bg-primary-500 text-label-m rounded-lg p-2 text-white"
+              >
                 보러가기
               </button>
             </div>
