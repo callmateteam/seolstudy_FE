@@ -15,6 +15,21 @@ const SUBJECT_DISPLAY: Record<string, string> = {
   MATH: "수학",
 };
 
+const GRADE_DISPLAY: Record<string, string> = {
+  HIGH1: "고1",
+  HIGH2: "고2",
+  HIGH3: "고3",
+  MIDDLE1: "중1",
+  MIDDLE2: "중2",
+  MIDDLE3: "중3",
+  high1: "고1",
+  high2: "고2",
+  high3: "고3",
+  middle1: "중1",
+  middle2: "중2",
+  middle3: "중3",
+};
+
 function getDensityColor(value: number) {
   if (value >= 80) return "bg-success-500";
   if (value >= 60) return "bg-warning-500";
@@ -36,7 +51,7 @@ export default function MenteeCard({
         <Avatar initials={name.charAt(0)} variant="default" size="lg" />
         <div className="flex flex-col">
           <span className="text-title-l text-gray-900">
-            {name} ({grade})
+            {name} ({GRADE_DISPLAY[grade] ?? grade})
           </span>
           <span className="text-body-m text-gray-500">{subjects.map((s) => SUBJECT_DISPLAY[s] ?? s).join(" · ")}</span>
         </div>

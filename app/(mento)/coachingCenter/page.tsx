@@ -27,6 +27,13 @@ const SUBJECT_DISPLAY: Record<string, string> = {
   MATH: "수학",
 };
 
+const GRADE_DISPLAY: Record<string, string> = {
+  HIGH1: "고1", HIGH2: "고2", HIGH3: "고3",
+  MIDDLE1: "중1", MIDDLE2: "중2", MIDDLE3: "중3",
+  high1: "고1", high2: "고2", high3: "고3",
+  middle1: "중1", middle2: "중2", middle3: "중3",
+};
+
 function taskStatusToDisplay(
   status: string,
 ): "검토 대기" | "검토 중" | "전송 완료" {
@@ -151,7 +158,7 @@ export default function CoachingCenter() {
   // 멘티 옵션
   const menteeOptions = mentees.map((m) => ({
     value: m.menteeId,
-    label: `${m.name} (${m.grade ?? ""})`,
+    label: `${m.name} (${GRADE_DISPLAY[m.grade ?? ""] ?? m.grade ?? ""})`,
   }));
 
   // 사진

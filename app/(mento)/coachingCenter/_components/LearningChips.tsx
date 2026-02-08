@@ -47,7 +47,7 @@ export default function LearningChips({ items, selectedId, onSelect }: LearningC
             key={item.id}
             type="button"
             onClick={() => onSelect(item.id)}
-            className={`flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 transition-colors ${getChipStyle(item.status)}`}
+            className={`flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 transition-colors ${selectedId === item.id ? "border-primary-500 bg-primary-50" : getChipStyle(item.status)}`}
           >
             <Pin size={14} className="text-gray-400" />
             <Tag variant={item.status === "검토 대기" ? "default" : "primary"}>
