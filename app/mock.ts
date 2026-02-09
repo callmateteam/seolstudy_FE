@@ -600,6 +600,25 @@ export async function mockRequest(req: MockRequest): Promise<SuccessResponse<any
   const taskSubmissionsMatch = path.match(/^\/api\/tasks\/([^/]+)\/submissions$/);
   if (taskSubmissionsMatch && method === "POST") {
     const taskId = taskSubmissionsMatch[1];
+    const rawResponses = ensureArray(body.problemResponses);
+
+    // 자동 채점 시뮬레이션
+    const problemMap = new Map(taskProblems.filter((p: any) => p.taskId === taskId).map((p: any) => [p.id, p]));
+    let autoCorrect = 0;
+    let autoTotal = 0;
+    const wrongNums: number[] = [];
+
+    const gradedResponses = rawResponses.map((pr: any) => {
+      const problem = problemMap.get(pr.problemId) as any;
+      let isCorrect: boolean | null = null;
+      if (problem?.correctAnswer && pr.answer != null) {
+        isCorrect = String(pr.answer).trim().toLowerCase() === String(problem.correctAnswer).trim().toLowerCase();
+        autoTotal++;
+        if (isCorrect) { autoCorrect++; } else { wrongNums.push(problem.number); }
+      }
+      return { id: nextId("pr"), problemId: pr.problemId, answer: pr.answer ?? null, isCorrect, textNote: pr.textNote ?? null, highlightData: pr.highlightData ?? null, drawingUrl: pr.drawingUrl ?? null };
+    });
+
     const submission = {
       id: nextId("submission"),
       taskId,
@@ -607,11 +626,11 @@ export async function mockRequest(req: MockRequest): Promise<SuccessResponse<any
       submissionType: body.submissionType ?? "TEXT",
       textContent: body.textContent ?? null,
       images: ensureArray(body.images),
-      selfScoreCorrect: body.selfScoreCorrect ?? null,
-      selfScoreTotal: body.selfScoreTotal ?? null,
-      wrongQuestions: ensureArray(body.wrongQuestions),
+      selfScoreCorrect: autoTotal > 0 ? autoCorrect : (body.selfScoreCorrect ?? null),
+      selfScoreTotal: autoTotal > 0 ? autoTotal : (body.selfScoreTotal ?? null),
+      wrongQuestions: autoTotal > 0 ? wrongNums : ensureArray(body.wrongQuestions),
       comment: body.comment ?? null,
-      problemResponses: ensureArray(body.problemResponses),
+      problemResponses: gradedResponses,
       submittedAt: "2026-02-05T12:00:00Z",
     };
     submissions.push(submission);

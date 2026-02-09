@@ -105,7 +105,7 @@ export default function ParentDashboard() {
       {/* 모바일: 상담 신청 고정 버튼 */}
       {!isDesktop && (
         <div className="fixed right-5 bottom-20 z-30">
-          <Button variant="primary" size="sm">
+          <Button variant="primary" size="sm" onClick={() => alert("상담 신청 기능은 준비 중입니다.")}>
             상담 신청
           </Button>
         </div>

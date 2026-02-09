@@ -27,7 +27,7 @@ function PlannerContent() {
       const success = await addComment(commentText);
       if (success) {
         setCommentText("");
-        window.location.reload();
+        refetch();
       }
     }
   };
@@ -71,8 +71,8 @@ function PlannerContent() {
       <div className="my-4 mb-8.5 flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-6">
         {/* 왼쪽 섹션 */}
         <div className="flex flex-col gap-3 lg:w-[45%]">
-          {/* 피드백 도착 */}
-          {data.hasYesterdayFeedback && data.yesterdayFeedbackDate && (
+          {/* 피드백 도착 — 오늘 날짜 선택 시에만 노출 */}
+          {selectedDate === new Date().toISOString().slice(0, 10) && data.hasYesterdayFeedback && data.yesterdayFeedbackDate && (
             <div className="flex items-center justify-between gap-2 rounded-4xl bg-gray-50 p-2 shadow-card">
               <MessageCircle />
               <div>
@@ -113,7 +113,7 @@ function PlannerContent() {
             <PlannerQnaCards comments={data.comments} feedback={data.todayFeedback} />
             {/* 피드백이 없을 때 */}
             {!data.todayFeedback && (
-              <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-primary-500 bg-primary-50 p-3 shadow-card">
+              <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-gray-300 bg-gray-50 p-3 shadow-card">
                 <p className="text-title-l text-gray-900">종합 피드백</p>
                 <p className="text-body-m text-gray-700">멘토님의 피드백이 아직 오지 않았어요</p>
               </div>
@@ -129,7 +129,7 @@ function PlannerContent() {
           <PlannerQnaCards comments={data.comments} feedback={data.todayFeedback} />
           {/* 피드백이 없을 때 */}
           {!data.todayFeedback && (
-            <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-primary-500 bg-primary-50 p-3 shadow-card">
+            <div className="flex flex-col gap-2 rounded-xl border-l-4 border-l-gray-300 bg-gray-50 p-3 shadow-card">
               <p className="text-title-l text-gray-900">종합 피드백</p>
               <p className="text-body-m text-gray-700">멘토님의 피드백이 아직 오지 않았어요</p>
             </div>

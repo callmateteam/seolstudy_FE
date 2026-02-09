@@ -122,6 +122,16 @@ export interface SubmissionCreateRequest {
   problemResponses?: ProblemResponseCreate[];
 }
 
+export interface SubmissionProblemResponse {
+  id: string;
+  problemId: string;
+  answer: string | null;
+  isCorrect: boolean | null;
+  textNote: string | null;
+  highlightData: Record<string, unknown> | null;
+  drawingUrl: string | null;
+}
+
 export interface SubmissionResponse {
   id: string;
   taskId: string;
@@ -133,6 +143,7 @@ export interface SubmissionResponse {
   selfScoreTotal: number | null;
   wrongQuestions: number[];
   comment: string | null;
+  problemResponses: SubmissionProblemResponse[];
   submittedAt: string;
 }
 
