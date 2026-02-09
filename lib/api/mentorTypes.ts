@@ -242,6 +242,7 @@ export interface SubmissionDetail {
   selfScoreTotal: number | null;
   wrongQuestions: number[];
   comment: string | null;
+  problemResponses: ProblemResponseDetail[];
   submittedAt: string;
 }
 
@@ -487,8 +488,21 @@ export interface SubmissionResponse {
 }
 
 export interface ProblemResponseData {
+  id: string;
   problemId: string;
   answer: string | null;
+  isCorrect: boolean | null;
+  textNote: string | null;
+  highlightData: Record<string, unknown> | null;
+  drawingUrl: string | null;
+}
+
+export interface ProblemResponseDetail {
+  problemId: string;
+  problemNumber: number;
+  problemTitle: string;
+  answer: string | null;
+  isCorrect: boolean | null;
   textNote: string | null;
   highlightData: Record<string, unknown> | null;
   drawingUrl: string | null;

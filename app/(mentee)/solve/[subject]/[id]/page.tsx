@@ -86,6 +86,8 @@ export default function SolvePage({
   const [studyTimeMinutes, setStudyTimeMinutes] = useState(0);
   const [commentText, setCommentText] = useState("");
   const [commentStatus, setCommentStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [serverScoreCorrect, setServerScoreCorrect] = useState<number | null>(null);
+  const [serverProblemResults, setServerProblemResults] = useState<Record<string, boolean | null>>({});
 
   useEffect(() => {
     menteeApi
@@ -97,12 +99,17 @@ export default function SolvePage({
 
   const quizProblems = task ? mapProblemsToQuiz(task.problems) : [];
 
-  // 답안 기반 리뷰 문제 생성 (정답 정보 없으므로 선택한 답을 그대로 표시)
-  const reviewProblems: ReviewProblem[] = quizProblems.map((p) => ({
-    ...p,
-    correctIndex: answers[p.id] ?? -1,
-    selectedIndex: answers[p.id] ?? -1,
-  }));
+  // 답안 기반 리뷰 문제 생성 (서버 자동 채점 결과 활용)
+  const reviewProblems: ReviewProblem[] = quizProblems.map((p) => {
+    const selectedIdx = answers[p.id] ?? -1;
+    const isCorrect = serverProblemResults[p.id];
+    return {
+      ...p,
+      // isCorrect === false면 오답 표시 (correctIndex를 -1로), 나머지는 정답 표시
+      correctIndex: isCorrect === false ? -1 : selectedIdx,
+      selectedIndex: selectedIdx,
+    };
+  });
 
   const answeredCount = Object.values(answers).filter((v) => v !== null).length;
 
@@ -140,7 +147,7 @@ export default function SolvePage({
         answer: answers[p.id] != null ? String(answers[p.id]! + 1) : null,
       }));
 
-      await menteeApi.submitTask(task.id, {
+      const response = await menteeApi.submitTask(task.id, {
         submissionType: "TEXT",
         images: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,
         studyTimeMinutes: minutes,
@@ -148,6 +155,18 @@ export default function SolvePage({
         selfScoreTotal: quizProblems.length || undefined,
         problemResponses: problemResponses.length > 0 ? problemResponses : undefined,
       });
+
+      // 서버 자동 채점 결과 저장
+      if (response.selfScoreCorrect != null) {
+        setServerScoreCorrect(response.selfScoreCorrect);
+      }
+      if (response.problemResponses?.length > 0) {
+        const resultMap: Record<string, boolean | null> = {};
+        for (const pr of response.problemResponses) {
+          resultMap[pr.problemId] = pr.isCorrect;
+        }
+        setServerProblemResults(resultMap);
+      }
 
       setPhase("submitted");
     } catch {
@@ -328,7 +347,7 @@ export default function SolvePage({
               )}
             </div>
             <div className="mt-2 flex items-baseline gap-1">
-              <span className="text-heading-l text-primary-500">{answeredCount}</span>
+              <span className="text-heading-l text-primary-500">{serverScoreCorrect ?? answeredCount}</span>
               <span className="text-title-l text-gray-400"> / </span>
               <span className="text-heading-l text-gray-400">{quizProblems.length}</span>
             </div>
