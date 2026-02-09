@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ClipboardList, BookOpen, MessageSquare, User } from "lucide-react";
 import { useIsDesktop } from "@/_hooks/useMediaQuery";
@@ -33,8 +34,8 @@ export default function MentoLayout({ children }: { children: ReactNode }) {
       {isDesktop && (
         <header className="border-b border-gray-200 bg-white">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5">
-            <Link href="/" className="text-heading-l text-primary-500">
-              설스터디
+            <Link href="/">
+              <Image alt="설스터디" src="/logos/Logo-120.svg" width={95} height={24} />
             </Link>
             <nav className="flex items-center gap-8">
               {DESKTOP_NAV_ITEMS.map((item) => {
