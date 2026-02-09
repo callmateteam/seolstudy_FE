@@ -41,7 +41,10 @@ export default function Feedback() {
   const [selectedItem, setSelectedItem] = useState<FeedbackItemWithAnalysis | null>(null);
 
   useEffect(() => {
-    if (!menteeId) return;
+    if (!menteeId) {
+      setLoading(true);
+      return;
+    }
     setLoading(true);
     feedbackApi
       .getBySubject(menteeId, selectedSubject)

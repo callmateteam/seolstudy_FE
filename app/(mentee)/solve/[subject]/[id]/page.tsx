@@ -220,6 +220,7 @@ export default function SolvePage({
   }
 
   const showPostGrading = phase === "postGrading" || phase === "timeRecord";
+  const showSubmitArea = showPostGrading || (quizProblems.length === 0 && phase === "study");
 
   // 태그 구성
   const subjectLabel = SUBJECT_MAP[task.subject] ?? task.subject;
@@ -330,37 +331,36 @@ export default function SolvePage({
         </button>
       )}
 
-      {/* 채점 완료 후: 인라인 결과 + 사진 업로드 */}
-      {showPostGrading && (
-        <>
-          <div className="border-t border-gray-200 pt-5">
-            <div className="flex items-center justify-between">
-              <h4 className="text-title-l text-gray-900">채점 결과</h4>
-              {quizProblems.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setPhase("review")}
-                  className="cursor-pointer text-label-l text-primary-500"
-                >
-                  결과보기
-                </button>
-              )}
-            </div>
-            <div className="mt-2 flex items-baseline gap-1">
-              <span className="text-heading-l text-primary-500">{serverScoreCorrect ?? answeredCount}</span>
-              <span className="text-title-l text-gray-400"> / </span>
-              <span className="text-heading-l text-gray-400">{quizProblems.length}</span>
-            </div>
+      {/* 채점 완료 후: 인라인 결과 */}
+      {showPostGrading && quizProblems.length > 0 && (
+        <div className="border-t border-gray-200 pt-5">
+          <div className="flex items-center justify-between">
+            <h4 className="text-title-l text-gray-900">채점 결과</h4>
+            <button
+              type="button"
+              onClick={() => setPhase("review")}
+              className="cursor-pointer text-label-l text-primary-500"
+            >
+              결과보기
+            </button>
           </div>
+          <div className="mt-2 flex items-baseline gap-1">
+            <span className="text-heading-l text-primary-500">{serverScoreCorrect ?? answeredCount}</span>
+            <span className="text-title-l text-gray-400"> / </span>
+            <span className="text-heading-l text-gray-400">{quizProblems.length}</span>
+          </div>
+        </div>
+      )}
 
-          <PhotoUploadStep onComplete={handlePhotoComplete} />
-        </>
+      {/* 사진 업로드 */}
+      {showSubmitArea && (
+        <PhotoUploadStep onComplete={handlePhotoComplete} />
       )}
     </div>
   );
 
   return (
-    <article className={showPostGrading && !isDesktop ? "pb-20" : ""}>
+    <article className={showSubmitArea && !isDesktop ? "pb-20" : ""}>
       {/* 헤더 */}
       <section className="mt-7 flex items-center justify-between px-5 lg:mx-auto lg:max-w-7xl">
         <div className="flex items-center gap-2">
@@ -443,8 +443,8 @@ export default function SolvePage({
         </section>
       )}
 
-      {/* 하단 고정 바 (채점 완료 후) */}
-      {showPostGrading && (
+      {/* 하단 고정 바 */}
+      {showSubmitArea && (
         <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between border-t border-gray-200 bg-white px-5 py-3">
           {task.materialUrl ? (
             <a href={task.materialUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-label-l text-gray-700">

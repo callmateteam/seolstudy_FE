@@ -75,7 +75,7 @@ export default function MonthlyView({
                   >
                     {day.date.getDate()}
                   </span>
-                  {isSelected && status !== "none" && (
+                  {isSelected && day.isToday && status !== "none" && (
                     <div
                       className={`rounded-full bg-white ${DOT_SIZE[status]}`}
                     />
@@ -84,7 +84,7 @@ export default function MonthlyView({
 
                 {/* 완료율 닷 — 선택되지 않은 날짜만 표시 */}
                 <div className="flex h-2.5 items-center justify-center">
-                  {!isSelected && status !== "none" && (
+                  {!isSelected && day.isToday && status !== "none" && (
                     <div
                       className={`rounded-full bg-primary-500 ${DOT_SIZE[status]}`}
                     />
