@@ -47,6 +47,19 @@
 }
 
 /* typography */
+@utility text-display-xl {
+  font-size: 68px;
+  line-height: 80px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+@utility text-display-l {
+  font-size: 40px;
+  line-height: 56px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
 @utility text-heading-xl {
   font-size: 24px;
   line-height: 32px;
