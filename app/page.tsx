@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Button from "@/components/ui/Button";
-import { ImageIcon } from "lucide-react";
 import Image from "next/image";
 import landingImg1 from "@/assets/landingImgs/image 85.png";
 import landingImg2 from "@/assets/landingImgs/image 86.png";
 import ipadPc from "@/assets/landingImgs/landing-ipad_PC.svg";
 import ipadMobile from "@/assets/landingImgs/landing_ipad_Mobile.svg";
+import LandingHeader from "./_components/LandingHeader";
 
 const PAIN_POINTS = [
   "열심히 공부해도, 성적이 오르지 않는 이유를 모르겠어요.",
@@ -59,35 +59,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* ── 헤더 ── */}
-      <header className="border-b border-gray-200 bg-gray-50">
-        <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 lg:px-20">
-          <Link
-            href="/"
-            className="text-primary-500 leading-6font-semibold text-[24px] tracking-[-0.48px]"
-          >
-            <Image alt="" src={"/logos/Logo-120.svg"} width={95} height={24} />
-          </Link>
-          <nav className="hidden items-center gap-7 lg:flex">
-            <span className="rounded-lg px-2 py-2 text-[16px] leading-6 font-normal text-gray-700">
-              학습관리
-            </span>
-            <span className="rounded-lg px-2 py-2 text-[16px] leading-6 font-normal text-gray-700">
-              코칭관리
-            </span>
-            <span className="rounded-lg px-2 py-2 text-[16px] leading-6 font-normal text-gray-700">
-              성장분석
-            </span>
-          </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-label-l text-gray-900">
-              로그인
-            </Link>
-            <Link href="/register" className="text-label-l text-gray-900">
-              회원가입
-            </Link>
-          </div>
-        </div>
-      </header>
+      <LandingHeader />
 
       {/* ── Hero ── */}
       <section className="bg-gray-50 px-5 py-10 lg:px-20 lg:py-20">
