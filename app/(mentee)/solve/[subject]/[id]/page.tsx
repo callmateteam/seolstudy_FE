@@ -315,7 +315,7 @@ export default function SolvePage({
           </div>
           <div
             className="mt-3 text-body-m leading-relaxed text-gray-700"
-            dangerouslySetInnerHTML={{ __html: task.content }}
+            dangerouslySetInnerHTML={{ __html: task.content ?? "" }}
           />
         </div>
       )}
