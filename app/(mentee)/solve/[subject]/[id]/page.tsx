@@ -235,8 +235,8 @@ export default function SolvePage({
   // keyPoints 파싱 시도 (JSON 배열 또는 텍스트)
   const keyPointsData = tryParseJSON<{ concept: string; description: string }[]>(task.keyPoints);
 
-  // content 파싱 시도 (JSON 배열 또는 텍스트)
-  const contentParagraphs = tryParseJSON<string[]>(task.content) ?? (task.content ? [task.content] : []);
+  // content: HTML 문자열로 직접 렌더링
+  const hasContent = !!task.content;
 
   // 학습 자료 콘텐츠
   const studyContent = (
@@ -297,7 +297,7 @@ export default function SolvePage({
       ) : null}
 
       {/* Part 2. 지문 읽기 */}
-      {contentParagraphs.length > 0 && (
+      {hasContent && (
         <div>
           <div className="flex items-center justify-between">
             <h4 className="text-title-l text-gray-900">
@@ -313,18 +313,15 @@ export default function SolvePage({
               </button>
             )}
           </div>
-          <div className="mt-3 flex flex-col gap-3">
-            {contentParagraphs.map((para, i) => (
-              <p key={i} className="text-body-m leading-relaxed text-gray-700">
-                {para}
-              </p>
-            ))}
-          </div>
+          <div
+            className="mt-3 text-body-m leading-relaxed text-gray-700"
+            dangerouslySetInnerHTML={{ __html: task.content ?? "" }}
+          />
         </div>
       )}
 
       {/* 문제가 없고 지문도 없을 때 문제풀기 버튼 표시 안함 */}
-      {contentParagraphs.length === 0 && !isDesktop && phase === "study" && quizProblems.length > 0 && (
+      {!hasContent && !isDesktop && phase === "study" && quizProblems.length > 0 && (
         <button
           type="button"
           onClick={() => setIsQuizModalOpen(true)}
@@ -335,7 +332,7 @@ export default function SolvePage({
       )}
 
       {/* 콘텐츠가 전혀 없을 때 empty state */}
-      {!task.keyPoints && contentParagraphs.length === 0 && quizProblems.length === 0 && (
+      {!task.keyPoints && !hasContent && quizProblems.length === 0 && (
         <div className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-gray-50 py-12">
           <p className="text-body-m text-gray-500">등록된 학습 콘텐츠가 아직 없습니다.</p>
         </div>
