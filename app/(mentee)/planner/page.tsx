@@ -14,7 +14,7 @@ import Card from "../../../components/ui/Card";
 function PlannerContent() {
   const router = useRouter();
   const { selectedDate } = useSelectedDate();
-  const { data, loading, error, refetch } = usePlannerData(selectedDate);
+  const { data, isInitialLoad, isFetching, error, refetch } = usePlannerData(selectedDate);
   const [commentText, setCommentText] = useState("");
   const [refetchTrigger, setRefetchTrigger] = useState(0);
 
@@ -32,7 +32,7 @@ function PlannerContent() {
     }
   };
 
-  if (loading) {
+  if (isInitialLoad) {
     return (
       <article className="mt-7 px-5 lg:px-10">
         <div className="flex items-center justify-center py-20">
@@ -122,7 +122,13 @@ function PlannerContent() {
         </div>
         {/* 오른쪽 섹션 / 오늘의 학습 */}
         <div className="lg:flex-1">
-          <TodayLearning tasks={data.tasks} onTaskCreated={refetch} />
+          {isFetching ? (
+            <div className="flex items-center justify-center py-12">
+              <p className="text-body-m text-gray-400">불러오는 중...</p>
+            </div>
+          ) : (
+            <TodayLearning tasks={data.tasks} onTaskCreated={refetch} />
+          )}
         </div>
         {/* 코멘트 & 피드백 섹션 - 모바일 */}
         <section className="flex flex-col gap-3 lg:hidden">

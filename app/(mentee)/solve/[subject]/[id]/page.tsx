@@ -93,7 +93,10 @@ export default function SolvePage({
     menteeApi
       .getTask(taskId)
       .then(setTask)
-      .catch(() => setTask(null))
+      .catch((err) => {
+        console.error("과제 로드 실패:", err);
+        setTask(null);
+      })
       .finally(() => setLoading(false));
   }, [taskId]);
 
@@ -329,6 +332,13 @@ export default function SolvePage({
         >
           문제풀기
         </button>
+      )}
+
+      {/* 콘텐츠가 전혀 없을 때 empty state */}
+      {!task.keyPoints && contentParagraphs.length === 0 && quizProblems.length === 0 && (
+        <div className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-gray-50 py-12">
+          <p className="text-body-m text-gray-500">등록된 학습 콘텐츠가 아직 없습니다.</p>
+        </div>
       )}
 
       {/* 채점 완료 후: 인라인 결과 */}
