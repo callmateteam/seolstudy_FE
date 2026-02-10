@@ -75,18 +75,18 @@ export default function MonthlyView({
                   >
                     {day.date.getDate()}
                   </span>
-                  {isSelected && day.isToday && status !== "none" && (
+                  {isSelected && day.isToday && (
                     <div
-                      className={`rounded-full bg-white ${DOT_SIZE[status]}`}
+                      className={`rounded-full bg-white ${DOT_SIZE[status] || "w-1 h-1"}`}
                     />
                   )}
                 </div>
 
                 {/* 완료율 닷 — 선택되지 않은 날짜만 표시 */}
                 <div className="flex h-2.5 items-center justify-center">
-                  {!isSelected && day.isToday && status !== "none" && (
+                  {!isSelected && day.isToday && (
                     <div
-                      className={`rounded-full bg-primary-500 ${DOT_SIZE[status]}`}
+                      className={`rounded-full bg-primary-500 ${DOT_SIZE[status] || "w-1 h-1"}`}
                     />
                   )}
                 </div>
