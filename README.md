@@ -34,14 +34,6 @@ npm run start
 npm run lint
 ```
 
-### 환경 변수
-
-`.env.local` 파일을 프로젝트 루트에 생성합니다.
-
-```env
-NEXT_PUBLIC_API_URL=http://13.209.77.28:8000
-```
-
 ## 프로젝트 구조
 
 ```
