@@ -32,7 +32,10 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 export default function ProfileCard({ data }: ProfileCardProps) {
   const joinDate = new Date(data.joinedAt);
   const joinDateStr = `${joinDate.getFullYear()}년 ${joinDate.getMonth() + 1}월 ${joinDate.getDate()}일 시작`;
-  const educationStr = `${data.university} ${data.college} ${data.department} (${data.enrollmentStatus})`;
+  const educationParts = [data.university, data.college, data.department].filter(Boolean).join(" ");
+  const educationStr = data.enrollmentStatus
+    ? educationParts ? `${educationParts} (${data.enrollmentStatus})` : data.enrollmentStatus
+    : educationParts;
   const subjectsStr = data.subjects.map((s) => SUBJECT_LABELS[s] ?? s).join(" · ");
 
   return (
